@@ -1,5 +1,9 @@
 import { createClient } from "@/utils/supabase/server";
-import { ExpansionTrendChart, SpeciesRatioChart } from "./charts";
+import {
+  ExpansionTrendChart,
+  SpeciesRatioChart,
+  WeeklyComparisonTile,
+} from "./charts";
 
 const SEAWEED_SPECIES = [
   "갈파래류",
@@ -51,6 +55,16 @@ export default async function DashboardPage() {
     ([location, points]) => ({ location, points }),
   );
 
+  // Highlight whichever site has the freshest data (currently the seeded
+  // 서귀포 조성지 demo weeks) as the "this week vs last week" headline.
+  const weeklyHighlight = [...byLocation.entries()]
+    .filter(([, points]) => points.length >= 2)
+    .sort((a, b) => {
+      const latestOf = (pts: { date: string }[]) =>
+        pts.reduce((m, p) => (p.date > m ? p.date : m), "");
+      return latestOf(b[1]).localeCompare(latestOf(a[1]));
+    })[0];
+
   return (
     <div className="mx-auto max-w-3xl px-6 py-10 font-sans">
       <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-300">
@@ -79,6 +93,15 @@ export default async function DashboardPage() {
 
       {rows.length > 0 && (
         <div className="flex flex-col gap-10">
+          {weeklyHighlight && (
+            <section>
+              <WeeklyComparisonTile
+                location={weeklyHighlight[0]}
+                points={weeklyHighlight[1]}
+              />
+            </section>
+          )}
+
           <section>
             <h2 className="mb-3 text-sm font-semibold text-neutral-700 dark:text-neutral-300">
               종류별 비율 (최신 조사 · {latest?.survey_date} · 지점{" "}

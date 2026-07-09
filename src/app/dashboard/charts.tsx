@@ -4,6 +4,77 @@ const CATEGORICAL = [
   { name: "series-3", light: "#eda100", dark: "#c98500" }, // yellow
 ];
 
+export function WeeklyComparisonTile({
+  location,
+  points,
+}: {
+  location: string;
+  points: { date: string; pct: number }[];
+}) {
+  const sorted = [...points].sort((a, b) => a.date.localeCompare(b.date));
+  const current = sorted[sorted.length - 1];
+  const previous = sorted.length > 1 ? sorted[sorted.length - 2] : null;
+  const delta = previous ? current.pct - previous.pct : null;
+  const isUp = (delta ?? 0) >= 0;
+
+  const sparkW = 120;
+  const sparkH = 32;
+  const max = Math.max(...sorted.map((p) => p.pct), 1);
+  const min = Math.min(...sorted.map((p) => p.pct), 0);
+  const range = max - min || 1;
+  const xOf = (i: number) =>
+    sorted.length <= 1 ? sparkW / 2 : (i / (sorted.length - 1)) * sparkW;
+  const yOf = (pct: number) => sparkH - ((pct - min) / range) * sparkH;
+  const path = sorted
+    .map((p, i) => `${i === 0 ? "M" : "L"} ${xOf(i)} ${yOf(p.pct)}`)
+    .join(" ");
+
+  return (
+    <div className="viz-root viz-stat-tile">
+      <div className="viz-stat-label">이번 주 바다숲 조성 현황 · {location}</div>
+      <div className="viz-stat-row">
+        <div>
+          <div className="viz-stat-value">{current.pct.toFixed(1)}%</div>
+          {delta !== null && (
+            <div className={`viz-stat-delta ${isUp ? "up" : "down"}`}>
+              {isUp ? "▲" : "▼"} {isUp ? "+" : ""}
+              {delta.toFixed(1)}%p 지난 주 대비
+            </div>
+          )}
+        </div>
+        <svg
+          width={sparkW}
+          height={sparkH}
+          viewBox={`0 0 ${sparkW} ${sparkH}`}
+          role="img"
+          aria-label="최근 추세"
+        >
+          <path
+            d={path}
+            fill="none"
+            stroke="var(--muted)"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <circle
+            cx={xOf(sorted.length - 1)}
+            cy={yOf(current.pct)}
+            r={4}
+            fill="var(--series-1)"
+            stroke="var(--surface-1)"
+            strokeWidth={2}
+          />
+        </svg>
+      </div>
+      <div className="viz-stat-caption">
+        {previous?.date ?? "-"} → {current.date}
+      </div>
+      <ChartStyle />
+    </div>
+  );
+}
+
 export function SpeciesRatioChart({
   data,
 }: {
@@ -194,6 +265,7 @@ function ChartStyle() {
     <style>{`
       .viz-root {
         --surface-1: #fcfcfb;
+        --text-primary: #0b0b0b;
         --text-secondary: #52514e;
         --muted: #898781;
         --gridline: #e1e0d9;
@@ -201,10 +273,13 @@ function ChartStyle() {
         --series-2: #1baf7a;
         --series-3: #eda100;
         --bar-track: #e1e0d9;
+        --status-good: #0ca30c;
+        --status-critical: #d03b3b;
       }
       @media (prefers-color-scheme: dark) {
         .viz-root {
           --surface-1: #1a1a19;
+          --text-primary: #ffffff;
           --text-secondary: #c3c2b7;
           --muted: #898781;
           --gridline: #2c2c2a;
@@ -212,8 +287,21 @@ function ChartStyle() {
           --series-2: #199e70;
           --series-3: #c98500;
           --bar-track: #2c2c2a;
+          --status-good: #0ca30c;
+          --status-critical: #e66767;
         }
       }
+      .viz-stat-tile {
+        padding: 16px; border-radius: 12px;
+        border: 1px solid var(--gridline); background: var(--surface-1);
+      }
+      .viz-stat-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; }
+      .viz-stat-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+      .viz-stat-value { font-size: 32px; font-weight: 600; color: var(--text-primary); line-height: 1; }
+      .viz-stat-delta { margin-top: 6px; font-size: 13px; font-weight: 500; }
+      .viz-stat-delta.up { color: var(--status-good); }
+      .viz-stat-delta.down { color: var(--status-critical); }
+      .viz-stat-caption { margin-top: 8px; font-size: 11px; color: var(--muted); }
       .viz-label { fill: var(--text-secondary); font-size: 11px; }
       .viz-value { fill: var(--text-secondary); font-size: 11px; }
       .viz-axis { fill: var(--muted); font-size: 10px; }
