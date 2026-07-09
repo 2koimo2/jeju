@@ -11,7 +11,7 @@ export default async function ProfileOnboardingPage() {
 
   const { data: existing } = await supabase
     .from("profiles")
-    .select("full_name, gender")
+    .select("full_name")
     .eq("user_id", user.id)
     .maybeSingle();
 
@@ -20,10 +20,5 @@ export default async function ProfileOnboardingPage() {
     (user.user_metadata?.name as string | undefined) ??
     "";
 
-  return (
-    <ProfileForm
-      defaultFullName={existing?.full_name ?? metadataName}
-      defaultGender={existing?.gender ?? null}
-    />
-  );
+  return <ProfileForm defaultFullName={existing?.full_name ?? metadataName} />;
 }

@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
-import { NicknameForm } from "./nickname-form";
+import { GenderForm } from "./gender-form";
 
-export default async function NicknameOnboardingPage() {
+export default async function GenderOnboardingPage() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -11,12 +11,11 @@ export default async function NicknameOnboardingPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name, gender, sea_name")
+    .select("full_name, gender")
     .eq("user_id", user.id)
     .maybeSingle();
 
   if (!profile?.full_name) redirect("/onboarding/profile");
-  if (!profile.gender) redirect("/onboarding/profile/gender");
 
-  return <NicknameForm defaultSeaName={profile.sea_name ?? ""} />;
+  return <GenderForm defaultGender={profile.gender ?? null} />;
 }
