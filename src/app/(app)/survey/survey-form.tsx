@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useActionState } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { submitSurvey, type SurveyActionState } from "./actions";
 import { LoadingScreen } from "@/components/loading-screen";
 import type { SurveyAnswers } from "@/lib/persona";
@@ -11,13 +13,15 @@ const initialState: SurveyActionState = { error: null };
 type Question = {
   name: keyof SurveyAnswers;
   label: string;
+  subtitle: string;
   options: { value: string; label: string }[];
 };
 
 const QUESTIONS: Question[] = [
   {
     name: "ageRange",
-    label: "연령대를 선택해주세요",
+    label: "연령대를 선택해 주세요.",
+    subtitle: "연령대에 맞는 난이도와 활동을 추천해 드려요.",
     options: [
       { value: "teens_or_under", label: "10대 이하" },
       { value: "twenties", label: "20대" },
@@ -29,6 +33,7 @@ const QUESTIONS: Question[] = [
   {
     name: "environmentalConcern",
     label: "환경보호에 관심이 있나요?",
+    subtitle: "관심 정도에 맞는 미션 난이도를 조절해 드려요.",
     options: [
       { value: "very_high", label: "매우 관심이 많아요" },
       { value: "high_but_hard", label: "관심은 있지만 실천이 어려워요" },
@@ -40,6 +45,7 @@ const QUESTIONS: Question[] = [
   {
     name: "occupation",
     label: "현재 어떤 생활 중인가요?",
+    subtitle: "생활 패턴에 맞는 실천 가능한 미션을 추천해 드려요.",
     options: [
       { value: "student", label: "학생" },
       { value: "office", label: "직장인" },
@@ -51,6 +57,7 @@ const QUESTIONS: Question[] = [
   {
     name: "transportMode",
     label: "자주 이용하는 이동수단은 무엇인가요?",
+    subtitle: "이동수단에 맞는 맞춤 미션을 제안해 드려요.",
     options: [
       { value: "walk", label: "걸어다녀요" },
       { value: "bike", label: "자전거" },
@@ -62,6 +69,7 @@ const QUESTIONS: Question[] = [
   {
     name: "deliveryFrequency",
     label: "배달음식은 얼마나 자주 이용하시나요?",
+    subtitle: "배달 습관을 고려한 미션을 함께 찾아볼게요.",
     options: [
       { value: "rarely", label: "거의 이용하지 않아요" },
       { value: "weekly_1_2", label: "주 1-2회" },
@@ -72,6 +80,7 @@ const QUESTIONS: Question[] = [
   {
     name: "consumptionTendency",
     label: "평소 소비 습관은 어떤가요?",
+    subtitle: "소비 습관에 맞는 실천 방법을 안내해 드려요.",
     options: [
       { value: "minimal", label: "꼭 필요한 것만 구매해요" },
       { value: "planned", label: "계획하고 구매해요" },
@@ -82,6 +91,7 @@ const QUESTIONS: Question[] = [
   {
     name: "disposableItemFrequency",
     label: "일회용품을 얼마나 사용하시나요?",
+    subtitle: "일회용품 사용 습관을 파악해 맞춤 미션을 드려요.",
     options: [
       { value: "rarely", label: "거의 사용하지 않아요" },
       { value: "sometimes", label: "가끔 사용해요" },
@@ -92,6 +102,7 @@ const QUESTIONS: Question[] = [
   {
     name: "energyUsage",
     label: "평소 전기 사용습관은 어떤가요?",
+    subtitle: "전기 사용 습관에 맞는 절약 미션을 추천해 드려요.",
     options: [
       { value: "low", label: "항상 절약해요" },
       { value: "medium", label: "필요한 만큼 사용해요" },
@@ -102,6 +113,7 @@ const QUESTIONS: Question[] = [
   {
     name: "recyclingFrequency",
     label: "분리배출은 얼마나 실천하시나요?",
+    subtitle: "분리배출 습관을 반영한 미션을 제안해 드려요.",
     options: [
       { value: "always", label: "항상해요" },
       { value: "usually", label: "대부분해요" },
@@ -112,6 +124,7 @@ const QUESTIONS: Question[] = [
   {
     name: "interestArea",
     label: "가장 관심있는 환경 활동은?",
+    subtitle: "관심 분야에 맞는 미션을 우선적으로 보여드려요.",
     options: [
       { value: "ocean_trash", label: "바다쓰레기 줄이기" },
       { value: "sea_forest", label: "바다숲복원" },
@@ -130,11 +143,29 @@ function defaultAnswersToState(
   );
 }
 
+function BackArrowIcon() {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M12.75 20C12.75 20.1989 12.671 20.3897 12.5303 20.5303C12.3897 20.671 12.1989 20.75 12 20.75C11.8011 20.75 11.6103 20.671 11.4697 20.5303C11.329 20.3897 11.25 20.1989 11.25 20V10.75H6C5.85176 10.7499 5.70688 10.7058 5.58367 10.6234C5.46045 10.541 5.36442 10.4239 5.30771 10.2869C5.251 10.15 5.23615 9.99926 5.26503 9.85386C5.29392 9.70846 5.36524 9.57489 5.47 9.47L11.47 3.47C11.6106 3.32955 11.8012 3.25066 12 3.25066C12.1988 3.25066 12.3894 3.32955 12.53 3.47L18.53 9.47C18.6348 9.57489 18.7061 9.70846 18.735 9.85386C18.7638 9.99926 18.749 10.15 18.6923 10.2869C18.6356 10.4239 18.5395 10.541 18.4163 10.6234C18.2931 10.7058 18.1482 10.7499 18 10.75H12.75V20Z"
+        fill="#978F88"
+      />
+    </svg>
+  );
+}
+
 export function SurveyForm({
   defaultAnswers,
 }: {
   defaultAnswers: SurveyAnswers | null;
 }) {
+  const router = useRouter();
   const [state, action, pending] = useActionState(submitSurvey, initialState);
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>(() =>
@@ -145,9 +176,15 @@ export function SurveyForm({
   const isFirstStep = step === 0;
   const isLastStep = step === QUESTIONS.length - 1;
   const hasAnsweredCurrent = Boolean(answers[currentQuestion.name]);
+  const progress = ((step + 1) / QUESTIONS.length) * 100;
 
   const setAnswer = (name: string, value: string) =>
     setAnswers((prev) => ({ ...prev, [name]: value }));
+
+  const handleBack = () => {
+    if (isFirstStep) router.back();
+    else setStep((s) => s - 1);
+  };
 
   if (pending) {
     return <LoadingScreen />;
@@ -156,86 +193,107 @@ export function SurveyForm({
   return (
     <form
       action={action}
-      className="flex min-h-screen flex-col gap-6 px-4 py-6"
+      className="flex min-h-screen flex-col bg-[#f7eedd] px-4 pt-[35px] pb-6"
     >
-      <div>
-        <div className="mb-3 flex items-center justify-between text-xs text-neutral-400">
-          <span>
-            {step + 1} / {QUESTIONS.length}
-          </span>
-        </div>
-        <div className="h-1.5 overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-800">
+      <div className="flex items-end gap-[10px] pr-[34px] pb-[10px]">
+        <button
+          type="button"
+          onClick={handleBack}
+          aria-label="이전으로"
+          className="flex size-6 shrink-0 -rotate-90 items-center justify-center"
+        >
+          <BackArrowIcon />
+        </button>
+        <p className="flex-1 text-center text-sm font-semibold text-[#544e49]">
+          개인맞춤 설문
+        </p>
+      </div>
+
+      <div className="relative mt-[26px] h-9 w-full">
+        <div className="absolute inset-0 rounded-full bg-[#ffdb8f] p-[9px]">
           <div
-            className="h-full rounded-full bg-neutral-900 transition-all dark:bg-neutral-50"
-            style={{
-              width: `${((step + 1) / QUESTIONS.length) * 100}%`,
-            }}
+            className="h-full rounded-full bg-[#03c346] transition-all"
+            style={{ width: `${progress}%` }}
           />
         </div>
+        <Image
+          src="/loading/green.png"
+          alt=""
+          aria-hidden="true"
+          width={38}
+          height={53}
+          className="absolute -top-[16px] h-[53px] w-[38px] object-contain transition-all"
+          style={{ left: `calc(${progress}% - 19px)` }}
+        />
+      </div>
+
+      <div className="flex flex-col gap-[10px] p-4 text-center">
+        <h1 className="text-[28px] leading-[1.15] font-bold text-[#262321]">
+          {currentQuestion.label}
+        </h1>
+        <p className="text-base font-medium text-[#776b63]">
+          {currentQuestion.subtitle}
+        </p>
       </div>
 
       {QUESTIONS.map((q, index) => (
         <fieldset
           key={q.name}
           hidden={index !== step}
-          className="flex flex-1 flex-col gap-3"
+          className="flex flex-1 flex-col gap-[22px]"
         >
-          <legend className="text-lg font-medium text-neutral-900 dark:text-neutral-50">
-            {q.label}
-          </legend>
+          <legend className="sr-only">{q.label}</legend>
 
-          <div className="mt-2 flex flex-col gap-2">
-            {q.options.map((opt) => (
+          {q.options.map((opt) => {
+            const selected = answers[q.name] === opt.value;
+            return (
               <label
                 key={opt.value}
-                className="flex items-center gap-2 rounded-lg border border-neutral-200 px-3 py-2.5 text-sm text-neutral-700 has-checked:border-neutral-900 has-checked:bg-neutral-50 dark:border-neutral-800 dark:text-neutral-300 dark:has-checked:border-neutral-50 dark:has-checked:bg-neutral-900"
+                className={`flex w-full items-center justify-center rounded-[15px] border-[7px] bg-white px-[15px] py-[13px] text-xl font-bold transition-colors ${
+                  selected
+                    ? "border-[#7f5b3b] text-[#7f5b3b]"
+                    : "border-transparent text-black"
+                }`}
               >
                 <input
                   type="radio"
                   name={q.name}
                   value={opt.value}
                   required
-                  checked={answers[q.name] === opt.value}
+                  checked={selected}
                   onChange={() => setAnswer(q.name, opt.value)}
+                  className="sr-only"
                 />
                 {opt.label}
               </label>
-            ))}
-          </div>
+            );
+          })}
         </fieldset>
       ))}
 
       {state.error && (
-        <p className="text-sm text-red-600 dark:text-red-400">
-          {state.error}
-        </p>
+        <p className="mt-4 text-center text-sm text-red-600">{state.error}</p>
       )}
 
-      <div className="mt-auto flex gap-2">
-        {!isFirstStep && (
-          <button
-            type="button"
-            onClick={() => setStep((s) => s - 1)}
-            className="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-600 dark:border-neutral-700 dark:text-neutral-300"
-          >
-            이전
-          </button>
-        )}
-
+      <div className="mt-6">
         {isLastStep ? (
           <button
             type="submit"
             disabled={pending || !hasAnsweredCurrent}
-            className="flex-1 rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-neutral-50 dark:text-neutral-900"
+            className={`flex h-16 w-full items-center justify-center rounded-[15px] text-xl font-bold text-white transition-colors ${
+              hasAnsweredCurrent ? "bg-[#7f5b3b]" : "bg-[#dad4c8]"
+            }`}
           >
-            {pending ? "제출 중..." : "제출하고 시작하기"}
+            제출하고 시작하기
           </button>
         ) : (
           <button
             type="button"
             disabled={!hasAnsweredCurrent}
             onClick={() => setStep((s) => s + 1)}
-            className="flex-1 rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-neutral-50 dark:text-neutral-900"
+            className={`flex h-16 w-full items-center justify-center rounded-[15px] text-xl font-bold text-white transition-colors ${
+              hasAnsweredCurrent ? "bg-[#7f5b3b]" : "bg-[#dad4c8]"
+            }`}
           >
             다음
           </button>
