@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import { requirePersona } from "@/lib/onboarding";
+import { MISSION_TEMP_DROP_C } from "@/lib/seaweed-growth";
 import { ProofForm } from "./proof-form";
 import type { MissionProofRow, MissionRow } from "../types";
 
@@ -11,6 +12,21 @@ const DIFFICULTY_LABEL: Record<"easy" | "medium" | "hard", string> = {
   medium: "보통",
   hard: "어려움",
 };
+
+const DIFFICULTY_PILL_STYLE: Record<
+  "easy" | "medium" | "hard",
+  { bg: string; text: string }
+> = {
+  easy: { bg: "#d3ffff", text: "#027776" },
+  medium: { bg: "#ffdee2", text: "#e03360" },
+  hard: { bg: "#ffdee2", text: "#e03360" },
+};
+
+function dropC(difficulty: MissionRow["difficulty"]): number | null {
+  return difficulty === "easy" || difficulty === "hard"
+    ? MISSION_TEMP_DROP_C[difficulty]
+    : null;
+}
 
 const VERDICT_LABEL: Record<MissionProofRow["verdict"], string> = {
   pending: "확인 중이에요",
@@ -58,28 +74,35 @@ export default async function MissionDetailPage({
     new Date(typedMission.expires_at) > new Date() &&
     (!latestProof || latestProof.verdict === "failed");
 
+  const pill = DIFFICULTY_PILL_STYLE[typedMission.difficulty];
+  const drop = dropC(typedMission.difficulty);
+
   return (
-    <div className="flex flex-col gap-4 px-4 py-4">
-      <div>
-        <p className="text-xs text-neutral-400">
-          {DIFFICULTY_LABEL[typedMission.difficulty]} ·{" "}
-          {typedMission.points}P · CO2 {typedMission.co2_saved_g}g
-        </p>
-        <h1 className="mt-1 text-lg font-semibold text-neutral-900 dark:text-neutral-50">
-          {typedMission.title}
-        </h1>
-        <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
-          {typedMission.description}
-        </p>
+    <div className="font-korean flex min-h-full flex-col gap-6 bg-[#f7eedd] px-4 py-6">
+      <div className="flex flex-col gap-[14px]">
+        <span
+          className="inline-flex w-fit items-center justify-center rounded-[555px] px-[10px] py-[4px] text-xs font-medium"
+          style={{ backgroundColor: pill.bg, color: pill.text }}
+        >
+          {DIFFICULTY_LABEL[typedMission.difficulty]}
+          {drop !== null ? ` | -${drop}°C` : ""}
+        </span>
+
+        <div className="flex flex-col gap-[6px] text-black">
+          <h1 className="text-[22px] font-bold">{typedMission.title}</h1>
+          <p className="text-[15px] leading-[22px] text-[#4d433b]">
+            {typedMission.description}
+          </p>
+        </div>
       </div>
 
       {latestProof && (
-        <div className="rounded-lg border border-neutral-200 px-3 py-2 text-sm dark:border-neutral-800">
-          <p className="font-medium text-neutral-700 dark:text-neutral-300">
+        <div className="rounded-[15px] bg-white px-4 py-3">
+          <p className="text-sm font-bold text-black">
             {VERDICT_LABEL[latestProof.verdict]}
           </p>
           {latestProof.reasoning && (
-            <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+            <p className="mt-1 text-xs text-[#978f88]">
               {latestProof.reasoning}
             </p>
           )}

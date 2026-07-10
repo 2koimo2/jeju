@@ -4,7 +4,7 @@ import { requirePersona } from "@/lib/onboarding";
 import { levelForPoints } from "@/lib/character";
 import { SPECIES_KEYS, type SpeciesKey } from "@/lib/species";
 import { SpeciesIconStrip } from "./species-icon-strip";
-import { SpeciesCard } from "./species-card";
+import { SpeciesCarousel } from "./species-carousel";
 
 type CharacterRow = { species: SpeciesKey | null; total_points: number };
 
@@ -30,16 +30,11 @@ export default async function CollectionPage() {
   return (
     <div className="flex flex-col gap-2 pb-6">
       <SpeciesIconStrip ownedSpecies={ownedSpecies} />
-      <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 py-3">
-        {SPECIES_KEYS.map((key) => (
-          <SpeciesCard
-            key={key}
-            speciesKey={key}
-            owned={key === ownedSpecies}
-            level={level}
-          />
-        ))}
-      </div>
+      <SpeciesCarousel
+        speciesKeys={SPECIES_KEYS}
+        ownedSpecies={ownedSpecies}
+        level={level}
+      />
     </div>
   );
 }

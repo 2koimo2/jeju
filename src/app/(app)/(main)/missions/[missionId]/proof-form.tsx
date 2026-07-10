@@ -1,9 +1,71 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { submitMissionProof, type ProofActionState } from "../actions";
 
 const initialState: ProofActionState = { error: null, verdict: null };
+
+function PlusIcon() {
+  return (
+    <svg viewBox="0 0 32 32" fill="none" className="size-8" aria-hidden="true">
+      <path
+        d="M16 6V26M6 16H26"
+        stroke="#a69382"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function PhotoPicker({ name }: { name: string }) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setPreviewUrl(file ? URL.createObjectURL(file) : null);
+  };
+
+  return (
+    <div>
+      <input
+        ref={inputRef}
+        type="file"
+        name={name}
+        accept="image/*"
+        capture="environment"
+        required
+        onChange={handleChange}
+        className="hidden"
+      />
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        aria-label="인증 사진 선택"
+        className="relative flex h-[162px] w-full items-center justify-center overflow-hidden rounded-[17px] bg-[#e8ddc8]"
+      >
+        {previewUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element -- local blob: preview, next/image can't optimize object URLs
+          <img
+            src={previewUrl}
+            alt=""
+            className="absolute inset-0 size-full object-cover"
+          />
+        ) : (
+          <PlusIcon />
+        )}
+      </button>
+    </div>
+  );
+}
 
 export function ProofForm({ missionId }: { missionId: string }) {
   const boundAction = submitMissionProof.bind(null, missionId);
@@ -13,34 +75,22 @@ export function ProofForm({ missionId }: { missionId: string }) {
   );
 
   return (
-    <form action={formAction} className="flex flex-col gap-4">
-      <label className="flex flex-col gap-2 text-sm text-neutral-700 dark:text-neutral-300">
-        인증 사진
-        <input
-          type="file"
-          name="photo"
-          accept="image/*"
-          capture="environment"
-          required
-          className="text-sm"
-        />
-      </label>
+    <form action={formAction} className="flex flex-1 flex-col gap-4">
+      <PhotoPicker name="photo" />
 
       {state.error && (
-        <p className="text-sm text-red-600 dark:text-red-400">
-          {state.error}
-        </p>
+        <p className="text-sm text-red-600">{state.error}</p>
       )}
 
       {state.verdict && (
         <div
           className={
             state.verdict.passed
-              ? "rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
-              : "rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-700 dark:bg-amber-950 dark:text-amber-300"
+              ? "rounded-[15px] bg-[#d3ffff] px-4 py-3 text-[#027776]"
+              : "rounded-[15px] bg-[#ffdee2] px-4 py-3 text-[#e03360]"
           }
         >
-          <p className="font-medium">
+          <p className="text-sm font-bold">
             {state.verdict.passed ? "미션 성공!" : "다시 시도해보세요"}
           </p>
           <p className="mt-1 text-xs opacity-80">{state.verdict.reasoning}</p>
@@ -50,7 +100,7 @@ export function ProofForm({ missionId }: { missionId: string }) {
       <button
         type="submit"
         disabled={pending}
-        className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-neutral-50 dark:text-neutral-900"
+        className="mt-auto w-full rounded-[15px] bg-[#7f5b3b] py-4 text-center text-[20px] font-bold text-white disabled:opacity-50"
       >
         {pending ? "인증 중..." : "사진 제출하기"}
       </button>

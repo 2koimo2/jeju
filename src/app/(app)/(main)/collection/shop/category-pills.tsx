@@ -3,7 +3,7 @@ import { SPECIES_KEYS, SPECIES_NAMES, type SpeciesKey } from "@/lib/species";
 
 export function CategoryPills({ active }: { active?: SpeciesKey }) {
   return (
-    <div className="flex gap-2 overflow-x-auto px-4 pt-[20px] pb-3">
+    <div className="no-scrollbar flex gap-2 overflow-x-auto px-4 pt-[20px] pb-3">
       <Link
         href="/collection/shop"
         className={`font-korean shrink-0 rounded-full px-4 py-2 text-sm font-bold ${
