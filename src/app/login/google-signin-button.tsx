@@ -21,10 +21,10 @@ export function GoogleSignInButton() {
       type="button"
       onClick={handleClick}
       disabled={pending}
-      className="flex h-12 w-full items-center gap-1 rounded-full border border-[#c4c4c4] bg-white pr-5 pl-1 shadow-sm disabled:opacity-50"
+      className="flex h-16 w-full items-center gap-1 rounded-full border border-[#c4c4c4] bg-white pr-5 pl-1 shadow-sm disabled:opacity-50"
     >
-      <span className="flex size-9 shrink-0 items-center justify-center rounded-full">
-        <svg width="20" height="20" viewBox="0 0 18 18" aria-hidden="true">
+      <span className="flex size-12 shrink-0 items-center justify-center rounded-full">
+        <svg width="26" height="26" viewBox="0 0 18 18" aria-hidden="true">
           <path
             fill="#4285F4"
             d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.62Z"
@@ -43,7 +43,7 @@ export function GoogleSignInButton() {
           />
         </svg>
       </span>
-      <span className="flex-1 text-center font-korean text-base font-medium text-black">
+      <span className="flex-1 text-center font-korean text-[20px] font-bold text-black">
         {pending ? "이동 중..." : "Google 로 시작하기"}
       </span>
     </button>

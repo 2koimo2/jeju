@@ -2,7 +2,9 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/utils/supabase/admin";
 import { computePersona, surveyAnswersSchema } from "@/lib/persona";
+import { PERSONA_SPECIES } from "@/lib/species";
 
 export type SurveyActionState = { error: string | null };
 
@@ -68,5 +70,16 @@ export async function submitSurvey(
   );
   if (upsertError) return { error: upsertError.message };
 
-  redirect("/missions");
+  // Privileged write: a user's own session must never set its own starter species
+  // directly (see utils/supabase/admin.ts), and this is a one-time "first gift" —
+  // ignoreDuplicates so retaking the survey later never reassigns an already-growing
+  // character's species.
+  const admin = createAdminClient();
+  const { error: grantError } = await admin.from("seaweed_characters").upsert(
+    { user_id: user.id, species: PERSONA_SPECIES[personaKey] },
+    { onConflict: "user_id", ignoreDuplicates: true },
+  );
+  if (grantError) return { error: grantError.message };
+
+  redirect("/survey/result");
 }

@@ -63,7 +63,7 @@ export function LoginContent() {
             className="absolute top-[65px] left-[20.63px] size-[373px]"
           />
 
-          <p className="absolute top-[333px] left-[201.13px] w-[119px] -translate-x-1/2 text-center font-display text-[23px] leading-[41px] text-[#099b9b]">
+          <p className="absolute top-[333px] left-[201.13px] w-[119px] -translate-x-1/2 text-center font-jeju text-[23px] leading-[41px] text-[#099b9b]">
             in Jeju
           </p>
         </div>
