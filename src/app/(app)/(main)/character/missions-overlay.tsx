@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { TemperatureGauge } from "@/components/temperature-gauge";
 import { MissionList } from "../missions/mission-list";
@@ -79,6 +80,13 @@ export function MissionsOverlay({
   const [missions, setMissions] = useState<MissionRow[] | null>(null);
   const [generating, setGenerating] = useState(false);
   const [isPending, startTransition] = useTransition();
+  // Portals need a browser document, so the sheet only renders post-mount —
+  // harmless since `open` starts false on first paint anyway (openInitially's
+  // effect fires after mount too).
+  const [mounted, setMounted] = useState(false);
+  // Standard client-mount flag for portals, not derived-state sync.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => setMounted(true), []);
 
   const refresh = async () => {
     setMissions(await getActiveMissions());
@@ -98,6 +106,8 @@ export function MissionsOverlay({
   // Deep-link from the report's "더 보기" — arrive on the home screen with
   // the sheet already open instead of requiring an extra tap.
   useEffect(() => {
+    // Intentional mount-time open for the deep-link case, not a derived-state sync.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (openInitially) handleOpen();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -120,27 +130,30 @@ export function MissionsOverlay({
     <>
       <button
         type="button"
-        onClick={open ? handleClose : handleOpen}
-        aria-label={open ? "닫기" : "오늘의 미션 보기"}
+        onClick={handleOpen}
+        aria-label="오늘의 미션 보기"
         className="flex size-16 items-center justify-center rounded-full bg-white shadow-[-2px_3px_4.1px_0px_rgba(0,127,133,0.15)]"
       >
-        {open ? <CloseChevronIcon /> : <MailIcon />}
+        <MailIcon />
       </button>
 
-      {open && (
+      {mounted && open && createPortal(
         <div className="fixed inset-0 z-50 flex flex-col justify-end">
-          <button
-            type="button"
-            aria-label="닫기"
-            className="absolute inset-0"
-            onClick={handleClose}
-          />
           <div
-            className={`relative flex max-h-[80vh] flex-col overflow-hidden rounded-t-[30px] bg-[#f7eedd] transition-transform duration-300 ${
+            className={`relative flex h-dvh flex-col overflow-hidden rounded-t-[30px] bg-[#f7eedd] transition-transform duration-300 ${
               visible ? "translate-y-0" : "translate-y-full"
             }`}
           >
-            <div className="font-korean relative z-10 flex-1 overflow-y-auto px-4 pt-6 pb-8">
+            <button
+              type="button"
+              onClick={handleClose}
+              aria-label="닫기"
+              className="absolute top-[26px] right-4 z-20 flex size-16 items-center justify-center rounded-full bg-white shadow-[-2px_3px_4.1px_0px_rgba(0,127,133,0.15)]"
+            >
+              <CloseChevronIcon />
+            </button>
+
+            <div className="font-korean relative z-10 flex-1 overflow-y-auto px-4 pt-[104px] pb-8">
               <div className="flex flex-col gap-[22px]">
                 {isPending && missions === null ? (
                   <p className="py-12 text-center text-sm text-white">
@@ -183,7 +196,8 @@ export function MissionsOverlay({
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );

@@ -5,7 +5,12 @@ import { createClient } from "@/utils/supabase/server";
 import { requirePersona } from "@/lib/onboarding";
 import { startOfKstDay, kstDateKey } from "@/lib/time";
 import { levelForPoints } from "@/lib/character";
-import { SPECIES_KEYS, SPECIES_DEFS, type SpeciesKey } from "@/lib/species";
+import {
+  SPECIES_KEYS,
+  SPECIES_DEFS,
+  speciesLv1Icon,
+  type SpeciesKey,
+} from "@/lib/species";
 
 type ProfileRow = { full_name: string; created_at: string };
 type CharacterRow = { species: SpeciesKey | null; total_points: number };
@@ -160,9 +165,7 @@ export default async function MyPage() {
           </p>
           <div className="mt-4 flex justify-between gap-2">
             {SPECIES_KEYS.map((key) => {
-              const def = SPECIES_DEFS[key];
               const owned = key === ownedSpecies;
-              const icon = def?.cardImage ?? def?.image;
 
               return (
                 <div
@@ -170,22 +173,14 @@ export default async function MyPage() {
                   className="flex flex-col items-center gap-2"
                 >
                   <div className="flex size-11 items-center justify-center">
-                    {icon ? (
-                      <Image
-                        src={icon}
-                        alt=""
-                        width={40}
-                        height={40}
-                        unoptimized
-                        className={`h-11 w-auto object-contain ${owned ? "" : "opacity-40 grayscale"}`}
-                      />
-                    ) : (
-                      <span
-                        className={`text-3xl ${owned ? "" : "opacity-40 grayscale"}`}
-                      >
-                        🌿
-                      </span>
-                    )}
+                    <Image
+                      src={speciesLv1Icon(key)}
+                      alt=""
+                      width={40}
+                      height={40}
+                      unoptimized
+                      className={`h-11 w-auto object-contain ${owned ? "" : "opacity-40 grayscale"}`}
+                    />
                   </div>
                   <span className="font-jeju text-sm text-[#644c0f]">
                     X{owned ? 1 : 0}

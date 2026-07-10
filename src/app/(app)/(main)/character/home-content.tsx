@@ -120,7 +120,7 @@ export function HomeContent({
   };
 
   return (
-    <div className="relative flex h-dvh w-full flex-col overflow-hidden bg-[#37c9d6]">
+    <div className="fixed inset-0 flex flex-col overflow-hidden bg-[#37c9d6]">
       <div className="fixed inset-0 z-0 flex justify-center overflow-hidden">
         <div className="relative h-full w-full max-w-sm">
           <Image

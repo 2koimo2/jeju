@@ -117,7 +117,7 @@ export async function generateTodayMissions(formData: FormData) {
 
   await supabase.from("missions").insert(rows);
 
-  revalidatePath("/missions");
+  revalidatePath("/character");
 }
 
 export type ProofActionState = {
@@ -233,7 +233,6 @@ export async function submitMissionProof(
     if (creditError) return { error: creditError.message, verdict: null };
   }
 
-  revalidatePath("/missions");
   revalidatePath("/character");
   revalidatePath(`/missions/${missionId}`);
 
