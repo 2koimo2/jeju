@@ -57,7 +57,7 @@ export function SpeciesCard({
   return (
     <div
       id={`card-${speciesKey}`}
-      className="relative h-[446.27px] w-[329.73px] shrink-0 snap-center overflow-hidden rounded-[11px] bg-[#f7eedd]"
+      className="relative h-[446.27px] w-[329.73px] shrink-0 snap-center snap-always overflow-hidden rounded-[11px] bg-[#f7eedd]"
     >
       {/* Banner: bleeds past the card's own edges, clipped by overflow-hidden above. */}
       <div

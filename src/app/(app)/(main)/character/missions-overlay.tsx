@@ -140,7 +140,7 @@ export function MissionsOverlay({
       {mounted && open && createPortal(
         <div className="fixed inset-0 z-50 flex flex-col justify-end">
           <div
-            className={`relative flex h-dvh flex-col overflow-hidden rounded-t-[30px] bg-[#f7eedd] transition-transform duration-300 ${
+            className={`relative flex h-dvh flex-col overflow-hidden rounded-t-[30px] transition-transform duration-300 ${
               visible ? "translate-y-0" : "translate-y-full"
             }`}
           >

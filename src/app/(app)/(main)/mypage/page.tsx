@@ -8,7 +8,7 @@ import { levelForPoints } from "@/lib/character";
 import {
   SPECIES_KEYS,
   SPECIES_DEFS,
-  speciesLv1Icon,
+  speciesLv4Icon,
   type SpeciesKey,
 } from "@/lib/species";
 
@@ -174,7 +174,7 @@ export default async function MyPage() {
                 >
                   <div className="flex size-11 items-center justify-center">
                     <Image
-                      src={speciesLv1Icon(key)}
+                      src={speciesLv4Icon(key)}
                       alt=""
                       width={40}
                       height={40}

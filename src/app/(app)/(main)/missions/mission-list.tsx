@@ -25,6 +25,20 @@ function dropC(difficulty: MissionRow["difficulty"]): number | null {
     : null;
 }
 
+function CameraIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className="size-[18px]" aria-hidden="true">
+      <path
+        d="M4 8.5C4 7.67157 4.67157 7 5.5 7H7.5L8.5 5H15.5L16.5 7H18.5C19.3284 7 20 7.67157 20 8.5V17.5C20 18.3284 19.3284 19 18.5 19H5.5C4.67157 19 4 18.3284 4 17.5V8.5Z"
+        stroke="#7f5b3b"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      <circle cx="12" cy="13" r="3.25" stroke="#7f5b3b" strokeWidth="1.6" />
+    </svg>
+  );
+}
+
 export function MissionList({ missions }: { missions: MissionRow[] }) {
   return (
     <ul className="font-korean flex flex-col">
@@ -34,17 +48,24 @@ export function MissionList({ missions }: { missions: MissionRow[] }) {
 
         return (
           <li key={mission.id}>
-            <Link
-              href={`/missions/${mission.id}`}
-              className="flex flex-col gap-[14px] py-3"
-            >
-              <span
-                className="inline-flex w-fit items-center justify-center rounded-[555px] px-[10px] py-[4px] text-xs font-medium"
-                style={{ backgroundColor: pill.bg, color: pill.text }}
-              >
-                {DIFFICULTY_LABEL[mission.difficulty]}
-                {drop !== null ? ` | -${drop}°C` : ""}
-              </span>
+            <div className="flex flex-col gap-[14px] py-3">
+              <div className="flex items-center justify-between gap-2">
+                <span
+                  className="inline-flex w-fit items-center justify-center rounded-[555px] px-[10px] py-[4px] text-xs font-medium"
+                  style={{ backgroundColor: pill.bg, color: pill.text }}
+                >
+                  {DIFFICULTY_LABEL[mission.difficulty]}
+                  {drop !== null ? ` | -${drop}°C` : ""}
+                </span>
+
+                <Link
+                  href={`/missions/${mission.id}`}
+                  aria-label="미션 인증하러가기"
+                  className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#f7f4ef]"
+                >
+                  <CameraIcon />
+                </Link>
+              </div>
 
               <div className="flex flex-col gap-[6px] text-black">
                 <p className="text-[18px] font-bold">{mission.title}</p>
@@ -53,16 +74,12 @@ export function MissionList({ missions }: { missions: MissionRow[] }) {
                 </p>
               </div>
 
-              <p className="text-[12px] text-[#a69589] underline">
-                미션 인증하러가기 &gt;&gt;
-              </p>
-
               {mission.status === "completed" && (
                 <span className="text-xs font-medium text-emerald-600">
                   완료
                 </span>
               )}
-            </Link>
+            </div>
             {index < missions.length - 1 && (
               <div className="h-px w-full bg-[#e5ddcf]" />
             )}

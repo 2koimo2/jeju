@@ -203,12 +203,12 @@ export const SPECIES_NAMES: Record<SpeciesKey, string> = {
 };
 
 /**
- * The 해초1(lv1) collection icon every species has, regardless of whether it
+ * The 해초4(lv4) collection icon every species has, regardless of whether it
  * has a full SPECIES_DEFS entry yet. Use this (not SPECIES_DEFS[key].cardImage)
  * for holdings/inventory icons — e.g. the 도감 species strip and 마이페이지
  * "보유 해초" row — so every species (owned or not) shows its own art instead
  * of a generic placeholder.
  */
-export function speciesLv1Icon(key: SpeciesKey): string {
-  return `/collection/species/${key}-lv1.png`;
+export function speciesLv4Icon(key: SpeciesKey): string {
+  return `/collection/species/${key}-lv4.png`;
 }

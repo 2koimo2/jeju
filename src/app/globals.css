@@ -39,3 +39,13 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Scrollable rows (species holdings strip, etc.) that shouldn't show a
+   persistent scrollbar track — the content itself implies swipe-ability. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

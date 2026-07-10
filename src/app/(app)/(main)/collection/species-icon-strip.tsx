@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { SPECIES_KEYS, speciesLv1Icon, type SpeciesKey } from "@/lib/species";
+import { SPECIES_KEYS, speciesLv4Icon, type SpeciesKey } from "@/lib/species";
 
 export function SpeciesIconStrip({
   ownedSpecies,
@@ -7,7 +7,7 @@ export function SpeciesIconStrip({
   ownedSpecies?: SpeciesKey;
 }) {
   return (
-    <div className="flex gap-3 overflow-x-auto px-4 pt-4 pb-1">
+    <div className="no-scrollbar flex gap-3 overflow-x-auto px-4 pt-4 pb-1">
       {SPECIES_KEYS.map((key) => {
         const owned = key === ownedSpecies;
 
@@ -19,7 +19,7 @@ export function SpeciesIconStrip({
           >
             <div className="flex size-14 items-center justify-center rounded-full bg-white shadow-sm">
               <Image
-                src={speciesLv1Icon(key)}
+                src={speciesLv4Icon(key)}
                 alt=""
                 width={40}
                 height={40}
