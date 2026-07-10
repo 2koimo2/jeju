@@ -2,10 +2,12 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { createPortal } from "react-dom";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { TemperatureGauge } from "@/components/temperature-gauge";
 import { MissionList } from "../missions/mission-list";
 import { generateTodayMissions, getActiveMissions } from "../missions/actions";
+import { resetTemperatureDemo } from "./actions";
 import type { MissionRow } from "../missions/types";
 
 const MAX_VISIBLE_MISSIONS = 3;
@@ -75,6 +77,7 @@ export function MissionsOverlay({
   temperatureC: number;
   openInitially?: boolean;
 }) {
+  const router = useRouter();
   const [open, setOpen] = useState(openInitially);
   const [visible, setVisible] = useState(false);
   const [missions, setMissions] = useState<MissionRow[] | null>(null);
@@ -126,6 +129,11 @@ export function MissionsOverlay({
     setGenerating(false);
   };
 
+  const handleDemoCoolDown = async () => {
+    await resetTemperatureDemo();
+    router.refresh();
+  };
+
   return (
     <>
       <button
@@ -161,7 +169,10 @@ export function MissionsOverlay({
                   </p>
                 ) : missions && missions.length > 0 ? (
                   <>
-                    <TemperatureGauge temperatureC={temperatureC} />
+                    <TemperatureGauge
+                      temperatureC={temperatureC}
+                      onDemoTripleClick={handleDemoCoolDown}
+                    />
 
                     <div className="rounded-[30px] bg-white px-4 py-5">
                       <div className="flex justify-end">

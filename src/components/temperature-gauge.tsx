@@ -1,3 +1,6 @@
+"use client";
+
+import { useRef } from "react";
 import Image from "next/image";
 import { MAX_TEMP_C, MIN_TEMP_C } from "@/lib/seaweed-growth";
 
@@ -7,7 +10,31 @@ function pickGaugeMessage(tempC: number): string {
   return "너무 더워서 힘들어해요";
 }
 
-export function TemperatureGauge({ temperatureC }: { temperatureC: number }) {
+const TRIPLE_CLICK_WINDOW_MS = 800;
+
+export function TemperatureGauge({
+  temperatureC,
+  onDemoTripleClick,
+}: {
+  temperatureC: number;
+  /** Hackathon-demo hook: fires when the °C badge is clicked 3x in quick succession. */
+  onDemoTripleClick?: () => void;
+}) {
+  const recentClicks = useRef<number[]>([]);
+
+  const handleBadgeClick = () => {
+    if (!onDemoTripleClick) return;
+    const now = Date.now();
+    const recent = [...recentClicks.current, now].filter(
+      (t) => now - t < TRIPLE_CLICK_WINDOW_MS,
+    );
+    recentClicks.current = recent;
+    if (recent.length >= 3) {
+      recentClicks.current = [];
+      onDemoTripleClick();
+    }
+  };
+
   const clamped = Math.min(MAX_TEMP_C, Math.max(MIN_TEMP_C, temperatureC));
   const fraction = (clamped - MIN_TEMP_C) / (MAX_TEMP_C - MIN_TEMP_C);
 
@@ -37,11 +64,15 @@ export function TemperatureGauge({ temperatureC }: { temperatureC: number }) {
             width={18}
             height={16}
           />
-          <div className="rounded-[5px] bg-[#ffdb8f] px-[5px] py-[5px] drop-shadow-[0px_2px_2.25px_rgba(73,49,3,0.25)]">
+          <button
+            type="button"
+            onClick={handleBadgeClick}
+            className="rounded-[5px] bg-[#ffdb8f] px-[5px] py-[5px] drop-shadow-[0px_2px_2.25px_rgba(73,49,3,0.25)]"
+          >
             <p className="font-korean text-[20px] font-semibold text-black">
               {Math.round(clamped)}°C
             </p>
-          </div>
+          </button>
         </div>
       </div>
     </div>
