@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
       // '/' cascades to the right place: /onboarding/profile for a new user,
-      // /survey or /missions for a returning one.
+      // /survey or /character for a returning one.
       return NextResponse.redirect(new URL("/", origin));
     }
   }

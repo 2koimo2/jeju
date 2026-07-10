@@ -19,7 +19,7 @@ const INFO_LINKS: { label: string; href?: string }[] = [
   { label: "결제 내역" },
   { label: "결제 수단 관리" },
   { label: "배송지 관리" },
-  { label: "미션 기록", href: "/missions" },
+  { label: "미션 기록", href: "/character?missions=open" },
   { label: "인증 내역" },
   { label: "기여도 리포트", href: "/report" },
 ];
