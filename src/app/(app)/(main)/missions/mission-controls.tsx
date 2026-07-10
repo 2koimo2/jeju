@@ -9,7 +9,7 @@ function GenerateStatusMessage() {
   const { pending } = useFormStatus();
   if (pending) return <LoadingScreen overlay />;
   return (
-    <p className="text-sm text-neutral-500 dark:text-neutral-400">
+    <p className="font-korean text-sm font-medium text-white">
       오늘의 미션을 준비할게요.
     </p>
   );
@@ -43,7 +43,7 @@ function RefreshSubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-600 disabled:opacity-50 dark:border-neutral-700 dark:text-neutral-300"
+      className="font-korean rounded-full bg-white px-3 py-1.5 text-xs font-medium text-[#5b3717] disabled:opacity-50"
     >
       {pending ? "생성 중..." : "새 미션 받기"}
     </button>

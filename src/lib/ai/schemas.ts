@@ -3,7 +3,7 @@ import { z } from "zod";
 export const generatedMissionSchema = z.object({
   title: z.string().min(2).max(60),
   description: z.string().min(5).max(300),
-  difficulty: z.enum(["easy", "medium", "hard"]),
+  difficulty: z.enum(["easy", "hard"]),
   suggestedPoints: z.number().int().min(1).max(1000),
   suggestedCo2SavedG: z.number().int().min(0).max(50000),
   verificationInstructions: z.string().min(10).max(500),

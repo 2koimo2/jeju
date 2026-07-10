@@ -4,7 +4,9 @@ import { requirePersona } from "@/lib/onboarding";
 import { ProofForm } from "./proof-form";
 import type { MissionProofRow, MissionRow } from "../types";
 
-const DIFFICULTY_LABEL: Record<MissionRow["difficulty"], string> = {
+// Keyed on all three historical difficulty values (not just the current
+// Difficulty type) so old 'medium' missions still display a label.
+const DIFFICULTY_LABEL: Record<"easy" | "medium" | "hard", string> = {
   easy: "쉬움",
   medium: "보통",
   hard: "어려움",

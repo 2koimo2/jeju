@@ -11,7 +11,7 @@ export function CollectionTabs() {
     <div className="flex items-center gap-[15px] px-4 pt-5 pb-2">
       <Link
         href="/collection"
-        className={`font-korean text-[36px] font-bold transition-colors ${
+        className={`font-korean text-[28px] font-bold transition-colors ${
           isShop ? "text-[#00b1b1]" : "text-black"
         }`}
       >
@@ -19,7 +19,7 @@ export function CollectionTabs() {
       </Link>
       <Link
         href="/collection/shop"
-        className={`font-korean text-[36px] font-bold transition-colors ${
+        className={`font-korean text-[28px] font-bold transition-colors ${
           isShop ? "text-black" : "text-[#00b1b1]"
         }`}
       >

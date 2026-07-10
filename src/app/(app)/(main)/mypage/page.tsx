@@ -105,7 +105,7 @@ export default async function MyPage() {
         </div>
 
         <div className="relative flex flex-col gap-6 rounded-[15px] bg-white p-4">
-          <Link href="/character" className="flex items-center gap-4 pr-6">
+          <Link href="/character" className="flex items-center gap-4">
             <div
               className="flex size-[100px] shrink-0 items-center justify-center overflow-hidden rounded-full"
               style={{ backgroundColor: speciesDef?.bannerColor ?? "#ffdce5" }}
@@ -124,20 +124,13 @@ export default async function MyPage() {
               )}
             </div>
             <div className="flex flex-col gap-1.5">
-              <p className="font-korean text-xl font-bold text-[#5b3717]">
+              <p className="font-jeju text-xl font-bold text-[#5b3717]">
                 {typedProfile.full_name}
               </p>
               <p className="font-korean text-base text-[#b7ada4]">
                 바다숲 키운지 {daysSince(typedProfile.created_at)}일째
               </p>
             </div>
-            <Image
-              src="/mypage/chevron.svg"
-              alt=""
-              width={24}
-              height={24}
-              className="absolute top-1/3 right-4 -rotate-90"
-            />
           </Link>
 
           <div className="flex items-end justify-around">

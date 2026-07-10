@@ -354,3 +354,13 @@ export const COLLECTION_CARD_DEFS: Record<SpeciesKey, CollectionCardDef> = {
 export function backdropSrc(speciesKey: SpeciesKey): string {
   return COLLECTION_CARD_DEFS[speciesKey].stageIcons[3].src;
 }
+
+/** The Lv.1 ("seed") stage icon. */
+export function lv1IconSrc(speciesKey: SpeciesKey): string {
+  return COLLECTION_CARD_DEFS[speciesKey].stageIcons[0].src;
+}
+
+/** The Lv.4 ("2단계") stage icon. */
+export function lv4IconSrc(speciesKey: SpeciesKey): string {
+  return COLLECTION_CARD_DEFS[speciesKey].stageIcons[1].src;
+}

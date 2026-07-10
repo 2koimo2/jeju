@@ -105,10 +105,10 @@ export default async function ReportPage({
 
   return (
     <div className="flex min-h-full flex-col bg-[#f7eedd]">
-      <div className="font-korean flex items-baseline gap-2 px-4 pt-6 pb-2">
+      <div className="font-korean flex items-baseline gap-2 px-4 pt-6 pb-6">
         <Link
           href="?tab=my"
-          className={`text-2xl ${
+          className={`text-[28px] ${
             tab === "my"
               ? "font-bold text-[#262321]"
               : "font-medium text-[#cbc3b8]"
@@ -118,7 +118,7 @@ export default async function ReportPage({
         </Link>
         <Link
           href="?tab=jeju"
-          className={`text-2xl ${
+          className={`text-[28px] ${
             tab === "jeju"
               ? "font-bold text-[#262321]"
               : "font-medium text-[#cbc3b8]"

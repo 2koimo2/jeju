@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import { requirePersona } from "@/lib/onboarding";
@@ -27,19 +28,34 @@ export default async function MissionsPage() {
   const activeMissions = (data ?? []) as MissionRow[];
 
   return (
-    <div className="flex flex-col">
-      <div className="flex items-center justify-between px-4 pt-4">
-        <h1 className="text-lg font-semibold text-neutral-900 dark:text-neutral-50">
-          오늘의 미션
-        </h1>
-        {activeMissions.length > 0 && <RefreshMissionsButton />}
+    <>
+      <div className="fixed inset-0 z-0 flex justify-center overflow-hidden">
+        <div className="relative h-full w-full max-w-sm">
+          <Image
+            src="/mypage/hero-bg.png"
+            alt=""
+            fill
+            unoptimized
+            priority
+            className="object-cover"
+          />
+        </div>
       </div>
 
-      {activeMissions.length === 0 ? (
-        <GenerateMissionsTrigger />
-      ) : (
-        <MissionList missions={activeMissions} />
-      )}
-    </div>
+      <div className="relative z-10 flex flex-col">
+        <div className="flex items-center justify-between px-4 pt-4">
+          <h1 className="font-korean text-lg font-semibold text-black">
+            오늘의 미션
+          </h1>
+          {activeMissions.length > 0 && <RefreshMissionsButton />}
+        </div>
+
+        {activeMissions.length === 0 ? (
+          <GenerateMissionsTrigger />
+        ) : (
+          <MissionList missions={activeMissions} />
+        )}
+      </div>
+    </>
   );
 }

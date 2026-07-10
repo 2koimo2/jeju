@@ -3,9 +3,9 @@ import { DIFFICULTY_BANDS, clampToDifficultyBand } from "./scoring";
 
 describe("clampToDifficultyBand", () => {
   it("passes values through unchanged when already inside the band", () => {
-    expect(clampToDifficultyBand("medium", 50, 1500)).toEqual({
-      points: 50,
-      co2SavedG: 1500,
+    expect(clampToDifficultyBand("hard", 100, 3000)).toEqual({
+      points: 100,
+      co2SavedG: 3000,
     });
   });
 
@@ -24,7 +24,7 @@ describe("clampToDifficultyBand", () => {
   });
 
   it("always returns integers", () => {
-    const result = clampToDifficultyBand("medium", 33.7, 1200.2);
+    const result = clampToDifficultyBand("easy", 15.7, 300.2);
     expect(Number.isInteger(result.points)).toBe(true);
     expect(Number.isInteger(result.co2SavedG)).toBe(true);
   });

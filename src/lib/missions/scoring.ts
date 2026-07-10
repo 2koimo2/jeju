@@ -1,15 +1,16 @@
-export type Difficulty = "easy" | "medium" | "hard";
+export type Difficulty = "easy" | "hard";
 
 /**
- * Must match the `points_within_difficulty_band` check constraint in
- * supabase/migrations/0002_grow_a_seaweed.sql exactly.
+ * Must stay within the `points_within_difficulty_band` check constraint in
+ * supabase/migrations/0002_grow_a_seaweed.sql. That constraint still also
+ * allows the retired 'medium' band so old rows remain valid — new missions
+ * are just never generated with it anymore.
  */
 export const DIFFICULTY_BANDS: Record<
   Difficulty,
   { points: [number, number]; co2SavedG: [number, number] }
 > = {
   easy: { points: [10, 30], co2SavedG: [100, 800] },
-  medium: { points: [30, 70], co2SavedG: [800, 2500] },
   hard: { points: [70, 150], co2SavedG: [2500, 8000] },
 };
 
