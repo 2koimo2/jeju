@@ -17,14 +17,16 @@ export async function submitSurvey(
   if (!user) redirect("/login");
 
   const parsed = surveyAnswersSchema.safeParse({
+    ageRange: formData.get("ageRange"),
     environmentalConcern: formData.get("environmentalConcern"),
-    deliveryFrequency: formData.get("deliveryFrequency"),
     occupation: formData.get("occupation"),
-    hasCar: formData.get("hasCar"),
+    transportMode: formData.get("transportMode"),
+    deliveryFrequency: formData.get("deliveryFrequency"),
     consumptionTendency: formData.get("consumptionTendency"),
     disposableItemFrequency: formData.get("disposableItemFrequency"),
     energyUsage: formData.get("energyUsage"),
     recyclingFrequency: formData.get("recyclingFrequency"),
+    interestArea: formData.get("interestArea"),
   });
 
   if (!parsed.success) {
@@ -36,14 +38,16 @@ export async function submitSurvey(
     computePersona(answers);
 
   const answerColumns = {
+    age_range: answers.ageRange,
     environmental_concern: answers.environmentalConcern,
-    delivery_frequency: answers.deliveryFrequency,
     occupation: answers.occupation,
-    has_car: answers.hasCar,
+    transport_mode: answers.transportMode,
+    delivery_frequency: answers.deliveryFrequency,
     consumption_tendency: answers.consumptionTendency,
     disposable_item_frequency: answers.disposableItemFrequency,
     energy_usage: answers.energyUsage,
     recycling_frequency: answers.recyclingFrequency,
+    interest_area: answers.interestArea,
     eco_action_score: ecoActionScore,
     footprint_score: footprintScore,
     persona_key: personaKey,

@@ -3,102 +3,120 @@
 import { useState } from "react";
 import { useActionState } from "react";
 import { submitSurvey, type SurveyActionState } from "./actions";
+import { LoadingScreen } from "@/components/loading-screen";
 import type { SurveyAnswers } from "@/lib/persona";
 
 const initialState: SurveyActionState = { error: null };
 
-type EnumFieldName = Exclude<keyof SurveyAnswers, "environmentalConcern">;
-
-type Question =
-  | { type: "likert"; name: "environmentalConcern"; label: string }
-  | {
-      type: "choice";
-      name: EnumFieldName;
-      label: string;
-      options: { value: string; label: string }[];
-    };
+type Question = {
+  name: keyof SurveyAnswers;
+  label: string;
+  options: { value: string; label: string }[];
+};
 
 const QUESTIONS: Question[] = [
   {
-    type: "likert",
-    name: "environmentalConcern",
-    label: "평소 환경 문제에 얼마나 관심이 있으신가요?",
-  },
-  {
-    type: "choice",
-    name: "deliveryFrequency",
-    label: "배달음식을 얼마나 자주 시켜 드시나요?",
+    name: "ageRange",
+    label: "연령대를 선택해주세요",
     options: [
-      { value: "rarely", label: "거의 안 시킴" },
-      { value: "monthly", label: "한 달에 몇 번" },
-      { value: "weekly", label: "일주일에 몇 번" },
-      { value: "frequent", label: "거의 매일" },
+      { value: "teens_or_under", label: "10대 이하" },
+      { value: "twenties", label: "20대" },
+      { value: "thirties", label: "30대" },
+      { value: "forties", label: "40대" },
+      { value: "fifties_plus", label: "50대 이상" },
     ],
   },
   {
-    type: "choice",
+    name: "environmentalConcern",
+    label: "환경보호에 관심이 있나요?",
+    options: [
+      { value: "very_high", label: "매우 관심이 많아요" },
+      { value: "high_but_hard", label: "관심은 있지만 실천이 어려워요" },
+      { value: "sometimes", label: "가끔 생각해요" },
+      { value: "low", label: "거의 관심이 없어요" },
+      { value: "unsure", label: "모르겠어요" },
+    ],
+  },
+  {
     name: "occupation",
-    label: "현재 직업은 무엇인가요?",
+    label: "현재 어떤 생활 중인가요?",
     options: [
       { value: "student", label: "학생" },
-      { value: "office", label: "사무직" },
-      { value: "field", label: "현장직" },
+      { value: "office", label: "직장인" },
+      { value: "homemaker", label: "주부" },
       { value: "self_employed", label: "자영업" },
-      { value: "homemaker", label: "전업주부" },
       { value: "other", label: "기타" },
     ],
   },
   {
-    type: "choice",
-    name: "hasCar",
-    label: "자차를 얼마나 이용하시나요?",
+    name: "transportMode",
+    label: "자주 이용하는 이동수단은 무엇인가요?",
     options: [
-      { value: "none", label: "자차 없음" },
-      { value: "occasional", label: "가끔 이용" },
-      { value: "daily", label: "매일 이용" },
+      { value: "walk", label: "걸어다녀요" },
+      { value: "bike", label: "자전거" },
+      { value: "public_transit", label: "대중교통" },
+      { value: "car", label: "자가용" },
+      { value: "motorcycle", label: "오토바이" },
     ],
   },
   {
-    type: "choice",
+    name: "deliveryFrequency",
+    label: "배달음식은 얼마나 자주 이용하시나요?",
+    options: [
+      { value: "rarely", label: "거의 이용하지 않아요" },
+      { value: "weekly_1_2", label: "주 1-2회" },
+      { value: "weekly_3_4", label: "주 3-4회" },
+      { value: "weekly_5_plus", label: "주 5회 이상" },
+    ],
+  },
+  {
     name: "consumptionTendency",
-    label: "평소 소비 성향은 어떤가요?",
+    label: "평소 소비 습관은 어떤가요?",
     options: [
-      { value: "minimal", label: "미니멀 (필요한 것만)" },
-      { value: "practical", label: "실용적" },
-      { value: "trendy", label: "유행을 따르는 편" },
-      { value: "impulsive", label: "충동적인 편" },
+      { value: "minimal", label: "꼭 필요한 것만 구매해요" },
+      { value: "planned", label: "계획하고 구매해요" },
+      { value: "discount_driven", label: "할인하면 자주 구매해요" },
+      { value: "impulsive", label: "충동구매가 많은 편이에요" },
     ],
   },
   {
-    type: "choice",
     name: "disposableItemFrequency",
-    label: "일회용품을 얼마나 자주 사용하시나요?",
+    label: "일회용품을 얼마나 사용하시나요?",
     options: [
-      { value: "rarely", label: "거의 안 씀" },
-      { value: "sometimes", label: "가끔" },
-      { value: "often", label: "자주" },
-      { value: "always", label: "거의 항상" },
+      { value: "rarely", label: "거의 사용하지 않아요" },
+      { value: "sometimes", label: "가끔 사용해요" },
+      { value: "often", label: "자주 사용해요" },
+      { value: "always", label: "거의 매일 사용해요" },
     ],
   },
   {
-    type: "choice",
     name: "energyUsage",
-    label: "가정에서 에너지(전기·가스) 사용량은 어느 정도인가요?",
+    label: "평소 전기 사용습관은 어떤가요?",
     options: [
-      { value: "low", label: "적은 편" },
-      { value: "medium", label: "보통" },
-      { value: "high", label: "많은 편" },
+      { value: "low", label: "항상 절약해요" },
+      { value: "medium", label: "필요한 만큼 사용해요" },
+      { value: "high", label: "많이 사용하는 편이에요" },
+      { value: "unsure", label: "잘 모르겠어요" },
     ],
   },
   {
-    type: "choice",
     name: "recyclingFrequency",
-    label: "분리배출을 얼마나 철저히 하시나요?",
+    label: "분리배출은 얼마나 실천하시나요?",
     options: [
-      { value: "always", label: "항상" },
-      { value: "usually", label: "대체로" },
-      { value: "sometimes", label: "가끔" },
-      { value: "rarely", label: "거의 안 함" },
+      { value: "always", label: "항상해요" },
+      { value: "usually", label: "대부분해요" },
+      { value: "sometimes", label: "가끔해요" },
+      { value: "rarely", label: "거의 하지 않아요" },
+    ],
+  },
+  {
+    name: "interestArea",
+    label: "가장 관심있는 환경 활동은?",
+    options: [
+      { value: "ocean_trash", label: "바다쓰레기 줄이기" },
+      { value: "sea_forest", label: "바다숲복원" },
+      { value: "marine_life", label: "해양생물 보호" },
+      { value: "carbon", label: "탄소 줄이기" },
     ],
   },
 ];
@@ -107,16 +125,9 @@ function defaultAnswersToState(
   defaultAnswers: SurveyAnswers | null,
 ): Record<string, string> {
   if (!defaultAnswers) return {};
-  return {
-    environmentalConcern: String(defaultAnswers.environmentalConcern),
-    deliveryFrequency: defaultAnswers.deliveryFrequency,
-    occupation: defaultAnswers.occupation,
-    hasCar: defaultAnswers.hasCar,
-    consumptionTendency: defaultAnswers.consumptionTendency,
-    disposableItemFrequency: defaultAnswers.disposableItemFrequency,
-    energyUsage: defaultAnswers.energyUsage,
-    recyclingFrequency: defaultAnswers.recyclingFrequency,
-  };
+  return Object.fromEntries(
+    QUESTIONS.map((q) => [q.name, defaultAnswers[q.name]]),
+  );
 }
 
 export function SurveyForm({
@@ -137,6 +148,10 @@ export function SurveyForm({
 
   const setAnswer = (name: string, value: string) =>
     setAnswers((prev) => ({ ...prev, [name]: value }));
+
+  if (pending) {
+    return <LoadingScreen />;
+  }
 
   return (
     <form
@@ -169,51 +184,24 @@ export function SurveyForm({
             {q.label}
           </legend>
 
-          {q.type === "likert" ? (
-            <>
-              <div className="mt-2 flex justify-between gap-1">
-                {[1, 2, 3, 4, 5].map((v) => (
-                  <label
-                    key={v}
-                    className="flex flex-1 flex-col items-center gap-1 text-xs text-neutral-500 dark:text-neutral-400"
-                  >
-                    <input
-                      type="radio"
-                      name={q.name}
-                      value={v}
-                      required
-                      checked={answers[q.name] === String(v)}
-                      onChange={() => setAnswer(q.name, String(v))}
-                    />
-                    {v}
-                  </label>
-                ))}
-              </div>
-              <div className="flex justify-between text-[11px] text-neutral-400">
-                <span>관심 없음</span>
-                <span>매우 관심 많음</span>
-              </div>
-            </>
-          ) : (
-            <div className="mt-2 flex flex-col gap-2">
-              {q.options.map((opt) => (
-                <label
-                  key={opt.value}
-                  className="flex items-center gap-2 rounded-lg border border-neutral-200 px-3 py-2.5 text-sm text-neutral-700 has-checked:border-neutral-900 has-checked:bg-neutral-50 dark:border-neutral-800 dark:text-neutral-300 dark:has-checked:border-neutral-50 dark:has-checked:bg-neutral-900"
-                >
-                  <input
-                    type="radio"
-                    name={q.name}
-                    value={opt.value}
-                    required
-                    checked={answers[q.name] === opt.value}
-                    onChange={() => setAnswer(q.name, opt.value)}
-                  />
-                  {opt.label}
-                </label>
-              ))}
-            </div>
-          )}
+          <div className="mt-2 flex flex-col gap-2">
+            {q.options.map((opt) => (
+              <label
+                key={opt.value}
+                className="flex items-center gap-2 rounded-lg border border-neutral-200 px-3 py-2.5 text-sm text-neutral-700 has-checked:border-neutral-900 has-checked:bg-neutral-50 dark:border-neutral-800 dark:text-neutral-300 dark:has-checked:border-neutral-50 dark:has-checked:bg-neutral-900"
+              >
+                <input
+                  type="radio"
+                  name={q.name}
+                  value={opt.value}
+                  required
+                  checked={answers[q.name] === opt.value}
+                  onChange={() => setAnswer(q.name, opt.value)}
+                />
+                {opt.label}
+              </label>
+            ))}
+          </div>
         </fieldset>
       ))}
 

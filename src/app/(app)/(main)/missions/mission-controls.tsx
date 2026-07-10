@@ -2,15 +2,15 @@
 
 import { useEffect, useRef } from "react";
 import { useFormStatus } from "react-dom";
+import { LoadingScreen } from "@/components/loading-screen";
 import { generateTodayMissions } from "./actions";
 
 function GenerateStatusMessage() {
   const { pending } = useFormStatus();
+  if (pending) return <LoadingScreen overlay />;
   return (
     <p className="text-sm text-neutral-500 dark:text-neutral-400">
-      {pending
-        ? "오늘의 미션을 만들고 있어요..."
-        : "오늘의 미션을 준비할게요."}
+      오늘의 미션을 준비할게요.
     </p>
   );
 }

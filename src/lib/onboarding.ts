@@ -36,7 +36,9 @@ export type PersonaRow = {
   eco_action_score: number;
   footprint_score: number;
   occupation: SurveyAnswers["occupation"];
-  has_car: SurveyAnswers["hasCar"];
+  transport_mode: SurveyAnswers["transportMode"];
+  age_range: SurveyAnswers["ageRange"] | null;
+  interest_area: SurveyAnswers["interestArea"] | null;
 };
 
 /** Cascades through requireProfile, then also requires a completed survey/persona. */
@@ -49,7 +51,7 @@ export async function requirePersona(
   const { data } = await supabase
     .from("user_personas")
     .select(
-      "persona_key, eco_action_score, footprint_score, occupation, has_car",
+      "persona_key, eco_action_score, footprint_score, occupation, transport_mode, age_range, interest_area",
     )
     .eq("user_id", userId)
     .maybeSingle();

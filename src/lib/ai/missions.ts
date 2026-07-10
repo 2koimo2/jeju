@@ -9,27 +9,44 @@ import { missionBatchSchema, type GeneratedMission } from "./schemas";
 
 const OCCUPATION_LABELS: Record<SurveyAnswers["occupation"], string> = {
   student: "학생",
-  office: "사무직",
-  field: "현장직",
+  office: "직장인",
+  homemaker: "주부",
   self_employed: "자영업",
-  homemaker: "전업주부",
   other: "기타",
 };
 
-const HAS_CAR_LABELS: Record<SurveyAnswers["hasCar"], string> = {
-  none: "자차 없음",
-  occasional: "가끔 이용",
-  daily: "매일 이용",
+const TRANSPORT_MODE_LABELS: Record<SurveyAnswers["transportMode"], string> =
+  {
+    walk: "도보",
+    bike: "자전거",
+    public_transit: "대중교통",
+    car: "자가용",
+    motorcycle: "오토바이",
+  };
+
+const AGE_RANGE_LABELS: Record<SurveyAnswers["ageRange"], string> = {
+  teens_or_under: "10대 이하",
+  twenties: "20대",
+  thirties: "30대",
+  forties: "40대",
+  fifties_plus: "50대 이상",
+};
+
+const INTEREST_AREA_LABELS: Record<SurveyAnswers["interestArea"], string> = {
+  ocean_trash: "바다쓰레기 줄이기",
+  sea_forest: "바다숲 복원",
+  marine_life: "해양생물 보호",
+  carbon: "탄소 줄이기",
 };
 
 function buildFeasibilityNotes(
   occupation: SurveyAnswers["occupation"],
-  hasCar: SurveyAnswers["hasCar"],
+  transportMode: SurveyAnswers["transportMode"],
 ): string[] {
   const notes: string[] = [];
-  if (hasCar === "none") {
+  if (transportMode !== "car" && transportMode !== "motorcycle") {
     notes.push(
-      "자차가 없으므로 자차 이용을 전제로 한 미션은 제안하지 말 것 (대중교통/도보/자전거 위주로 제안).",
+      "자차/오토바이를 이용하지 않으므로 자차 이용을 전제로 한 미션은 제안하지 말 것 (도보/자전거/대중교통 위주로 제안).",
     );
   }
   if (occupation === "student") {
@@ -37,7 +54,7 @@ function buildFeasibilityNotes(
       "학생이므로 직장 통근 대신 등하교/학교생활 맥락에 맞는 미션을 제안할 것.",
     );
   } else if (occupation === "homemaker") {
-    notes.push("전업주부이므로 가정 내 에너지·소비 관련 미션을 우선 고려할 것.");
+    notes.push("주부이므로 가정 내 에너지·소비 관련 미션을 우선 고려할 것.");
   }
   return notes;
 }
@@ -47,13 +64,15 @@ export async function generateMissionBatch(input: {
   ecoActionScore: number;
   footprintScore: number;
   occupation: SurveyAnswers["occupation"];
-  hasCar: SurveyAnswers["hasCar"];
+  transportMode: SurveyAnswers["transportMode"];
+  ageRange: SurveyAnswers["ageRange"] | null;
+  interestArea: SurveyAnswers["interestArea"] | null;
   recentMissionTitles: string[];
 }): Promise<GeneratedMission[]> {
   const persona = PERSONA_DEFS[input.personaKey];
   const feasibilityNotes = buildFeasibilityNotes(
     input.occupation,
-    input.hasCar,
+    input.transportMode,
   );
 
   const system = `당신은 탄소절감 습관 형성 앱 "해초키우기"의 미션 생성기입니다.
@@ -63,9 +82,9 @@ export async function generateMissionBatch(input: {
   const prompt = `사용자 페르소나: ${persona.label} — ${persona.description}
 환경 실천 점수(ecoActionScore, 0~100): ${input.ecoActionScore}
 소비/에너지 발자국 점수(footprintScore, 0~100): ${input.footprintScore}
-직업: ${OCCUPATION_LABELS[input.occupation]}
-자차 이용: ${HAS_CAR_LABELS[input.hasCar]}
-${feasibilityNotes.length > 0 ? `제약 조건:\n${feasibilityNotes.map((n) => `- ${n}`).join("\n")}\n` : ""}${
+${input.ageRange ? `연령대: ${AGE_RANGE_LABELS[input.ageRange]}\n` : ""}직업: ${OCCUPATION_LABELS[input.occupation]}
+주 이동수단: ${TRANSPORT_MODE_LABELS[input.transportMode]}
+${input.interestArea ? `가장 관심있는 환경 활동: ${INTEREST_AREA_LABELS[input.interestArea]} (가능하면 이 활동과 연관된 미션을 하나 이상 포함할 것)\n` : ""}${feasibilityNotes.length > 0 ? `제약 조건:\n${feasibilityNotes.map((n) => `- ${n}`).join("\n")}\n` : ""}${
     input.recentMissionTitles.length > 0
       ? `최근 제공된 미션(중복 피할 것): ${input.recentMissionTitles.join(", ")}\n`
       : ""

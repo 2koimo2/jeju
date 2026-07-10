@@ -2,21 +2,23 @@ import { describe, expect, it } from "vitest";
 import { computePersona, type SurveyAnswers } from "./persona";
 
 const base: SurveyAnswers = {
-  environmentalConcern: 3,
-  deliveryFrequency: "monthly",
+  ageRange: "thirties",
+  environmentalConcern: "sometimes",
   occupation: "office",
-  hasCar: "none",
-  consumptionTendency: "practical",
+  transportMode: "public_transit",
+  deliveryFrequency: "weekly_1_2",
+  consumptionTendency: "planned",
   disposableItemFrequency: "sometimes",
   energyUsage: "medium",
   recyclingFrequency: "usually",
+  interestArea: "carbon",
 };
 
 describe("computePersona", () => {
   it("maps high eco-action + low footprint to green_master", () => {
     const result = computePersona({
       ...base,
-      environmentalConcern: 5,
+      environmentalConcern: "very_high",
       recyclingFrequency: "always",
       disposableItemFrequency: "rarely",
       deliveryFrequency: "rarely",
@@ -31,10 +33,10 @@ describe("computePersona", () => {
   it("maps high eco-action + high footprint to eco_striver", () => {
     const result = computePersona({
       ...base,
-      environmentalConcern: 5,
+      environmentalConcern: "very_high",
       recyclingFrequency: "always",
       disposableItemFrequency: "rarely",
-      deliveryFrequency: "frequent",
+      deliveryFrequency: "weekly_5_plus",
       energyUsage: "high",
       consumptionTendency: "impulsive",
     });
@@ -46,7 +48,7 @@ describe("computePersona", () => {
   it("maps low eco-action + low footprint to quiet_minimalist", () => {
     const result = computePersona({
       ...base,
-      environmentalConcern: 1,
+      environmentalConcern: "low",
       recyclingFrequency: "rarely",
       disposableItemFrequency: "always",
       deliveryFrequency: "rarely",
@@ -61,10 +63,10 @@ describe("computePersona", () => {
   it("maps low eco-action + high footprint to habit_builder", () => {
     const result = computePersona({
       ...base,
-      environmentalConcern: 1,
+      environmentalConcern: "low",
       recyclingFrequency: "rarely",
       disposableItemFrequency: "always",
-      deliveryFrequency: "frequent",
+      deliveryFrequency: "weekly_5_plus",
       energyUsage: "high",
       consumptionTendency: "impulsive",
     });
@@ -76,7 +78,7 @@ describe("computePersona", () => {
   it("treats a tie at the score=50 boundary as 'high' on both axes", () => {
     const result = computePersona({
       ...base,
-      environmentalConcern: 3,
+      environmentalConcern: "unsure",
       recyclingFrequency: "always",
       disposableItemFrequency: "always",
       deliveryFrequency: "rarely",
@@ -86,5 +88,20 @@ describe("computePersona", () => {
     expect(result.ecoActionScore).toBe(50);
     expect(result.footprintScore).toBe(50);
     expect(result.personaKey).toBe("eco_striver");
+  });
+
+  it("scores 'unsure' concern/energy answers as a neutral 50, distinct from the low end", () => {
+    const result = computePersona({
+      ...base,
+      environmentalConcern: "unsure",
+      recyclingFrequency: "rarely",
+      disposableItemFrequency: "always",
+      deliveryFrequency: "rarely",
+      energyUsage: "unsure",
+      consumptionTendency: "minimal",
+    });
+    // concern(50) + sorting(0) + disposable(0) = mean 17; energy(50) folds into footprint too.
+    expect(result.ecoActionScore).toBeGreaterThan(0);
+    expect(result.footprintScore).toBeGreaterThan(0);
   });
 });

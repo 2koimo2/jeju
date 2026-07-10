@@ -16,23 +16,26 @@ export default async function SurveyPage() {
   const { data: existing } = await supabase
     .from("user_personas")
     .select(
-      "environmental_concern, delivery_frequency, occupation, has_car, consumption_tendency, disposable_item_frequency, energy_usage, recycling_frequency",
+      "age_range, environmental_concern, occupation, transport_mode, delivery_frequency, consumption_tendency, disposable_item_frequency, energy_usage, recycling_frequency, interest_area",
     )
     .eq("user_id", user.id)
     .maybeSingle();
 
-  const defaultAnswers: SurveyAnswers | null = existing
-    ? {
-        environmentalConcern: existing.environmental_concern,
-        deliveryFrequency: existing.delivery_frequency,
-        occupation: existing.occupation,
-        hasCar: existing.has_car,
-        consumptionTendency: existing.consumption_tendency,
-        disposableItemFrequency: existing.disposable_item_frequency,
-        energyUsage: existing.energy_usage,
-        recyclingFrequency: existing.recycling_frequency,
-      }
-    : null;
+  const defaultAnswers: SurveyAnswers | null =
+    existing && existing.age_range && existing.interest_area
+      ? {
+          ageRange: existing.age_range,
+          environmentalConcern: existing.environmental_concern,
+          occupation: existing.occupation,
+          transportMode: existing.transport_mode,
+          deliveryFrequency: existing.delivery_frequency,
+          consumptionTendency: existing.consumption_tendency,
+          disposableItemFrequency: existing.disposable_item_frequency,
+          energyUsage: existing.energy_usage,
+          recyclingFrequency: existing.recycling_frequency,
+          interestArea: existing.interest_area,
+        }
+      : null;
 
   return <SurveyForm defaultAnswers={defaultAnswers} />;
 }

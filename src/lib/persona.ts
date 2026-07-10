@@ -1,21 +1,38 @@
 import { z } from "zod";
 
 export const surveyAnswersSchema = z.object({
-  environmentalConcern: z.coerce.number().int().min(1).max(5),
-  deliveryFrequency: z.enum(["rarely", "monthly", "weekly", "frequent"]),
-  occupation: z.enum([
-    "student",
-    "office",
-    "field",
-    "self_employed",
-    "homemaker",
-    "other",
+  ageRange: z.enum([
+    "teens_or_under",
+    "twenties",
+    "thirties",
+    "forties",
+    "fifties_plus",
   ]),
-  hasCar: z.enum(["none", "occasional", "daily"]),
+  environmentalConcern: z.enum([
+    "very_high",
+    "high_but_hard",
+    "sometimes",
+    "low",
+    "unsure",
+  ]),
+  occupation: z.enum(["student", "office", "homemaker", "self_employed", "other"]),
+  transportMode: z.enum([
+    "walk",
+    "bike",
+    "public_transit",
+    "car",
+    "motorcycle",
+  ]),
+  deliveryFrequency: z.enum([
+    "rarely",
+    "weekly_1_2",
+    "weekly_3_4",
+    "weekly_5_plus",
+  ]),
   consumptionTendency: z.enum([
     "minimal",
-    "practical",
-    "trendy",
+    "planned",
+    "discount_driven",
     "impulsive",
   ]),
   disposableItemFrequency: z.enum([
@@ -24,8 +41,14 @@ export const surveyAnswersSchema = z.object({
     "often",
     "always",
   ]),
-  energyUsage: z.enum(["low", "medium", "high"]),
+  energyUsage: z.enum(["low", "medium", "high", "unsure"]),
   recyclingFrequency: z.enum(["always", "usually", "sometimes", "rarely"]),
+  interestArea: z.enum([
+    "ocean_trash",
+    "sea_forest",
+    "marine_life",
+    "carbon",
+  ]),
 });
 
 export type SurveyAnswers = z.infer<typeof surveyAnswersSchema>;
@@ -65,7 +88,13 @@ export const PERSONA_DEFS: Record<
   },
 };
 
-const CONCERN_SCORE = (concern: number) => (concern - 1) * 25;
+const CONCERN_SCORE: Record<SurveyAnswers["environmentalConcern"], number> = {
+  very_high: 100,
+  high_but_hard: 66,
+  sometimes: 33,
+  low: 0,
+  unsure: 50,
+};
 
 const SORTING_SCORE: Record<SurveyAnswers["recyclingFrequency"], number> = {
   always: 100,
@@ -86,15 +115,16 @@ const ECO_DISPOSABLE_SCORE: Record<
 
 const DELIVERY_SCORE: Record<SurveyAnswers["deliveryFrequency"], number> = {
   rarely: 0,
-  monthly: 33,
-  weekly: 66,
-  frequent: 100,
+  weekly_1_2: 33,
+  weekly_3_4: 66,
+  weekly_5_plus: 100,
 };
 
 const ENERGY_SCORE: Record<SurveyAnswers["energyUsage"], number> = {
   low: 0,
   medium: 50,
   high: 100,
+  unsure: 50,
 };
 
 const CONSUMPTION_SCORE: Record<
@@ -102,8 +132,8 @@ const CONSUMPTION_SCORE: Record<
   number
 > = {
   minimal: 0,
-  practical: 33,
-  trendy: 66,
+  planned: 33,
+  discount_driven: 66,
   impulsive: 100,
 };
 
@@ -117,14 +147,15 @@ export type PersonaResult = {
 };
 
 /**
- * Pure, deterministic rule-based persona mapping. occupation/hasCar are intentionally
- * excluded from scoring — they're used as mission-feasibility context at generation
- * time instead (e.g. no car-related missions for someone with hasCar: 'none').
+ * Pure, deterministic rule-based persona mapping. ageRange/occupation/transportMode/
+ * interestArea are intentionally excluded from scoring — they're used as mission-context
+ * (feasibility, tone, preferred activity type) at generation time instead (see
+ * buildFeasibilityNotes in lib/ai/missions.ts).
  */
 export function computePersona(answers: SurveyAnswers): PersonaResult {
   const ecoActionScore = Math.round(
     mean([
-      CONCERN_SCORE(answers.environmentalConcern),
+      CONCERN_SCORE[answers.environmentalConcern],
       SORTING_SCORE[answers.recyclingFrequency],
       ECO_DISPOSABLE_SCORE[answers.disposableItemFrequency],
     ]),

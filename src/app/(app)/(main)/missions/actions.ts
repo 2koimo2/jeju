@@ -68,7 +68,9 @@ export async function generateTodayMissions(formData: FormData) {
     ecoActionScore: persona.eco_action_score,
     footprintScore: persona.footprint_score,
     occupation: persona.occupation,
-    hasCar: persona.has_car,
+    transportMode: persona.transport_mode,
+    ageRange: persona.age_range,
+    interestArea: persona.interest_area,
     recentMissionTitles: (recent ?? []).map((m) => m.title),
   });
 
