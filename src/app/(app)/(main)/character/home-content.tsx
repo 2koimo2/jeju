@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import type { SpeciesKey } from "@/lib/species";
 import {
@@ -9,6 +10,39 @@ import {
   stageImageSrc,
 } from "@/lib/home-stage-art";
 import { MissionsOverlay } from "./missions-overlay";
+
+function CheckIcon() {
+  return (
+    <svg viewBox="0 0 64 64" fill="none" className="size-16" aria-hidden="true">
+      <circle cx="32" cy="32" r="30" fill="#00c8c9" />
+      <path
+        d="M19 33.5L27.5 42L45 22"
+        stroke="#ffffff"
+        strokeWidth="5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function CompletionOverlay({ onDismiss }: { onDismiss: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onDismiss}
+      aria-label="닫기"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+    >
+      <div className="flex size-[220px] flex-col items-center justify-center gap-3 rounded-[24px] bg-white shadow-xl">
+        <CheckIcon />
+        <p className="font-korean text-lg font-bold text-black">
+          완료되었습니다!
+        </p>
+      </div>
+    </button>
+  );
+}
 
 const HOT_MESSAGES = ["아 더워...", "너무 뜨거워요...", "시원해지고 싶어요..."];
 const WARM_MESSAGES = ["오늘도 무럭무럭!", "조금만 더 식으면 좋겠어요"];
@@ -27,6 +61,7 @@ export function HomeContent({
   stageIndex,
   temperatureC,
   openMissions,
+  justCompleted,
 }: {
   seaName: string;
   species: SpeciesKey;
@@ -34,10 +69,24 @@ export function HomeContent({
   stageIndex: number;
   temperatureC: number;
   openMissions?: boolean;
+  justCompleted?: boolean;
 }) {
+  const router = useRouter();
   const [bubble, setBubble] = useState<string | null>(null);
   const [bump, setBump] = useState(false);
+  const [showCompletion, setShowCompletion] = useState(justCompleted ?? false);
   const size = stageDisplaySize(species, stageIndex);
+
+  useEffect(() => {
+    if (!justCompleted) return;
+    // Strip the ?completed=1 param so a refresh/back-nav doesn't replay the
+    // overlay; showCompletion already captured the initial value above, so
+    // this re-navigation doesn't affect whether it's currently showing.
+    router.replace("/character", { scroll: false });
+    const timer = setTimeout(() => setShowCompletion(false), 2500);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!bubble) return;
@@ -51,6 +100,10 @@ export function HomeContent({
   };
 
   return (
+    <>
+      {showCompletion && (
+        <CompletionOverlay onDismiss={() => setShowCompletion(false)} />
+      )}
     <div className="fixed inset-0 flex flex-col overflow-hidden bg-[#37c9d6]">
       <div className="fixed inset-0 z-0 flex justify-center overflow-hidden">
         <div className="relative h-full w-full max-w-sm">
@@ -163,5 +216,6 @@ export function HomeContent({
         }
       `}</style>
     </div>
+    </>
   );
 }

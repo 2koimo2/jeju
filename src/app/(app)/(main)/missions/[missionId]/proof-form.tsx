@@ -78,25 +78,6 @@ export function ProofForm({ missionId }: { missionId: string }) {
     <form action={formAction} className="flex flex-1 flex-col gap-4">
       <PhotoPicker name="photo" />
 
-      {state.error && (
-        <p className="text-sm text-red-600">{state.error}</p>
-      )}
-
-      {state.verdict && (
-        <div
-          className={
-            state.verdict.passed
-              ? "rounded-[15px] bg-[#d3ffff] px-4 py-3 text-[#027776]"
-              : "rounded-[15px] bg-[#ffdee2] px-4 py-3 text-[#e03360]"
-          }
-        >
-          <p className="text-sm font-bold">
-            {state.verdict.passed ? "미션 성공!" : "다시 시도해보세요"}
-          </p>
-          <p className="mt-1 text-xs opacity-80">{state.verdict.reasoning}</p>
-        </div>
-      )}
-
       <button
         type="submit"
         disabled={pending}
@@ -104,6 +85,20 @@ export function ProofForm({ missionId }: { missionId: string }) {
       >
         {pending ? "인증 중..." : "사진 제출하기"}
       </button>
+
+      {/* A passing verdict redirects to the home completion overlay instead
+          of returning here — this box only ever renders a failed/needs-review
+          reason (or a plain form/upload error), always below the button. */}
+      {state.error && (
+        <p className="text-sm text-red-600">{state.error}</p>
+      )}
+
+      {state.verdict && !state.verdict.passed && (
+        <div className="rounded-[15px] bg-[#ffdee2] px-4 py-3 text-[#e03360]">
+          <p className="text-sm font-bold">다시 시도해보세요</p>
+          <p className="mt-1 text-xs opacity-80">{state.verdict.reasoning}</p>
+        </div>
+      )}
     </form>
   );
 }

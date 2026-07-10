@@ -15,10 +15,11 @@ type CharacterRow = {
 export default async function CharacterPage({
   searchParams,
 }: {
-  searchParams: Promise<{ missions?: string }>;
+  searchParams: Promise<{ missions?: string; completed?: string }>;
 }) {
-  const { missions } = await searchParams;
+  const { missions, completed } = await searchParams;
   const openMissions = missions === "open";
+  const justCompleted = completed === "1";
 
   const supabase = await createClient();
   const {
@@ -56,6 +57,7 @@ export default async function CharacterPage({
       stageIndex={snapshot.stageIndex}
       temperatureC={snapshot.temperatureC}
       openMissions={openMissions}
+      justCompleted={justCompleted}
     />
   );
 }

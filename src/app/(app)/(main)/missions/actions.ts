@@ -208,29 +208,51 @@ export async function submitMissionProof(
 
   // Privileged writes from here on: a user's own session must never be able to write
   // verdict/growth data directly (see migration comments), so we switch to the
-  // service-role client for exactly these two steps.
-  const admin = createAdminClient();
+  // service-role client for exactly these two steps. Wrapped defensively — a missing
+  // service-role env var (createAdminClient throws synchronously) or any unexpected
+  // RPC failure would otherwise surface as an unhandled 500 instead of a clean state.
+  try {
+    const admin = createAdminClient();
 
-  const { error: verdictUpdateError } = await admin
-    .from("mission_proofs")
-    .update({
-      verdict: status,
-      confidence: verdict.confidence,
-      reasoning: verdict.reasoning,
-      detected_elements: verdict.detectedElements,
-      model_id: VISION_MODEL,
-      verified_at: new Date().toISOString(),
-    })
-    .eq("id", proof.id);
-  if (verdictUpdateError) {
-    return { error: verdictUpdateError.message, verdict: null };
+    const { error: verdictUpdateError } = await admin
+      .from("mission_proofs")
+      .update({
+        verdict: status,
+        confidence: verdict.confidence,
+        reasoning: verdict.reasoning,
+        detected_elements: verdict.detectedElements,
+        model_id: VISION_MODEL,
+        verified_at: new Date().toISOString(),
+      })
+      .eq("id", proof.id);
+    if (verdictUpdateError) {
+      return { error: verdictUpdateError.message, verdict: null };
+    }
+
+    if (status === "passed") {
+      const { error: creditError } = await admin.rpc("credit_mission_growth", {
+        p_mission_proof_id: proof.id,
+      });
+      if (creditError) return { error: creditError.message, verdict: null };
+    }
+  } catch (err) {
+    return {
+      error:
+        err instanceof Error
+          ? err.message
+          : "결과를 저장하는 중 오류가 발생했어요. 다시 시도해주세요.",
+      verdict: null,
+    };
   }
 
   if (status === "passed") {
-    const { error: creditError } = await admin.rpc("credit_mission_growth", {
-      p_mission_proof_id: proof.id,
-    });
-    if (creditError) return { error: creditError.message, verdict: null };
+    revalidatePath("/character");
+    revalidatePath(`/missions/${missionId}`);
+
+    // Success is shown as a completion overlay on the home screen, not inline
+    // here — leaving this page's own state (and the sheet mid-scroll below)
+    // doesn't read as "you're done," so send the user back to their seaweed.
+    redirect("/character?completed=1");
   }
 
   revalidatePath("/character");
