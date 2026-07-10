@@ -1,12 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 
 export function GoogleSignInButton() {
   const [pending, setPending] = useState(false);
+  // A synchronous guard in addition to `pending` state: a fast double-tap
+  // (common on mobile) can fire twice before React commits the re-render
+  // that disables the button, kicking off two competing OAuth redirects.
+  const clickedRef = useRef(false);
 
   const handleClick = async () => {
+    if (clickedRef.current) return;
+    clickedRef.current = true;
     setPending(true);
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithOAuth({
@@ -16,7 +22,10 @@ export function GoogleSignInButton() {
         queryParams: { prompt: "select_account" },
       },
     });
-    if (error) setPending(false);
+    if (error) {
+      setPending(false);
+      clickedRef.current = false;
+    }
   };
 
   return (

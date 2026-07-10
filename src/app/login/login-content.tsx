@@ -6,7 +6,10 @@ import { useFitScale } from "@/hooks/use-fit-scale";
 import { GoogleSignInButton } from "./google-signin-button";
 
 const DESIGN_WIDTH = 402;
-const DESIGN_HEIGHT = 874;
+// Trimmed from the design's full 874px — that left ~44px of empty margin
+// below the button (nothing else sits past it), making the splash taller
+// than it needed to be on real viewports.
+const DESIGN_HEIGHT = 830;
 
 export function LoginContent() {
   const searchParams = useSearchParams();
@@ -23,7 +26,7 @@ export function LoginContent() {
         style={{ width: DESIGN_WIDTH * scale, height: DESIGN_HEIGHT * scale }}
       >
         <div
-          className="absolute top-0 left-0 h-[874px] w-[402px] origin-top-left"
+          className="absolute top-0 left-0 h-[830px] w-[402px] origin-top-left"
           style={{ transform: `scale(${scale})` }}
         >
           <Image
