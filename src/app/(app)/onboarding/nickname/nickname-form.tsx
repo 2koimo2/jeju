@@ -19,7 +19,7 @@ export function NicknameForm({
   const router = useRouter();
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#f7eedd]">
+    <div className="flex min-h-dvh flex-col bg-[#f7eedd]">
       <div className="grid grid-cols-[24px_1fr_24px] items-center px-4 py-[15px]">
         <button
           type="button"
