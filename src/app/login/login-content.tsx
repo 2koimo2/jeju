@@ -1,39 +1,17 @@
 "use client";
 
-import { useLayoutEffect, useState } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
+import { useFitScale } from "@/hooks/use-fit-scale";
 import { GoogleSignInButton } from "./google-signin-button";
 
 const DESIGN_WIDTH = 402;
 const DESIGN_HEIGHT = 874;
-const MAX_WIDTH = 448; // matches the old max-w-md cap on desktop
-
-function useFitScale() {
-  const [scale, setScale] = useState(1);
-
-  useLayoutEffect(() => {
-    const updateScale = () => {
-      const vw = Math.min(window.innerWidth, MAX_WIDTH);
-      const vh = window.visualViewport?.height ?? window.innerHeight;
-      setScale(Math.min(vw / DESIGN_WIDTH, vh / DESIGN_HEIGHT));
-    };
-    updateScale();
-    window.addEventListener("resize", updateScale);
-    window.visualViewport?.addEventListener("resize", updateScale);
-    return () => {
-      window.removeEventListener("resize", updateScale);
-      window.visualViewport?.removeEventListener("resize", updateScale);
-    };
-  }, []);
-
-  return scale;
-}
 
 export function LoginContent() {
   const searchParams = useSearchParams();
   const failed = searchParams.get("error") === "oauth_failed";
-  const scale = useFitScale();
+  const scale = useFitScale(DESIGN_WIDTH, DESIGN_HEIGHT);
 
   return (
     <div
