@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useActionState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -143,6 +143,50 @@ function defaultAnswersToState(
   );
 }
 
+/**
+ * Figma's selected-option outline is a hand-drawn brush stroke, not a plain CSS
+ * border — there's no clean vector/border-radius equivalent, so we fake the
+ * texture with an SVG turbulence filter that jitters a rounded-rect stroke.
+ */
+function BrushBorder({ color }: { color: string }) {
+  const filterId = useId();
+  return (
+    <svg
+      className="pointer-events-none absolute inset-0 size-full overflow-visible"
+      aria-hidden="true"
+    >
+      <filter id={filterId} x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence
+          type="fractalNoise"
+          baseFrequency="0.9"
+          numOctaves={2}
+          seed={7}
+          result="noise"
+        />
+        <feDisplacementMap
+          in="SourceGraphic"
+          in2="noise"
+          scale={3}
+          xChannelSelector="R"
+          yChannelSelector="G"
+        />
+      </filter>
+      <rect
+        x="3.5"
+        y="3.5"
+        width="calc(100% - 7px)"
+        height="calc(100% - 7px)"
+        rx="14"
+        ry="14"
+        fill="none"
+        stroke={color}
+        strokeWidth="7"
+        filter={`url(#${filterId})`}
+      />
+    </svg>
+  );
+}
+
 function BackArrowIcon() {
   return (
     <svg
@@ -249,10 +293,8 @@ export function SurveyForm({
             return (
               <label
                 key={opt.value}
-                className={`flex w-full items-center justify-center rounded-[15px] border-[7px] bg-white px-[15px] py-[13px] text-xl font-bold transition-colors ${
-                  selected
-                    ? "border-[#7f5b3b] text-[#7f5b3b]"
-                    : "border-transparent text-black"
+                className={`relative flex w-full items-center justify-center rounded-[15px] border-[7px] border-transparent bg-white px-[15px] py-[13px] text-xl font-bold ${
+                  selected ? "text-[#7f5b3b]" : "text-black"
                 }`}
               >
                 <input
@@ -264,6 +306,7 @@ export function SurveyForm({
                   onChange={() => setAnswer(q.name, opt.value)}
                   className="sr-only"
                 />
+                {selected && <BrushBorder color="#7f5b3b" />}
                 {opt.label}
               </label>
             );
