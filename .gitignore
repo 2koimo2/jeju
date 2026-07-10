@@ -55,3 +55,7 @@ next-env.d.ts
 /ml/artifacts
 __pycache__/
 *.pyc
+
+# raw design/font source drops (already copied into public/ or src/fonts as needed)
+/이미지
+/폰트
