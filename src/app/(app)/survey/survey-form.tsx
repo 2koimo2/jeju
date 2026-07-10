@@ -237,7 +237,7 @@ export function SurveyForm({
   return (
     <form
       action={action}
-      className="flex min-h-screen flex-col bg-[#f7eedd] px-4 pt-[35px] pb-6"
+      className="flex min-h-screen flex-col bg-[#f7eedd] px-4 pt-[35px] pb-[104px]"
     >
       <div className="flex items-end gap-[10px] pr-[34px] pb-[10px]">
         <button
@@ -318,7 +318,7 @@ export function SurveyForm({
         <p className="mt-4 text-center text-sm text-red-600">{state.error}</p>
       )}
 
-      <div className="mt-6">
+      <div className="fixed inset-x-0 bottom-0 bg-[#f7eedd] px-4 pt-3 pb-6 shadow-[0_-2px_8px_rgba(0,0,0,0.06)]">
         {isLastStep ? (
           <button
             type="submit"
