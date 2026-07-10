@@ -12,24 +12,25 @@ type OptionVisualState = "neutral" | "selected" | "dimmed";
 
 function GenderOption({
   label,
-  colorSrc,
-  graySrc,
-  aspectRatio,
+  neutralSrc,
+  selectedSrc,
   state,
   onClick,
   disabled,
 }: {
   label: string;
-  colorSrc: string;
-  graySrc: string;
-  aspectRatio: number;
+  neutralSrc: string;
+  selectedSrc: string;
   state: OptionVisualState;
   onClick: () => void;
   disabled: boolean;
 }) {
   const size = state === "selected" ? 170 : state === "dimmed" ? 130 : 150;
+  const isDimmed = state === "dimmed";
+  const isSelected = state === "selected";
+  const imgSrc = isSelected ? selectedSrc : neutralSrc;
   const imgHeight = size;
-  const imgWidth = Math.round(size * aspectRatio);
+  const imgWidth = size;
   const labelClass =
     state === "selected"
       ? "text-[32px] font-bold"
@@ -49,26 +50,17 @@ function GenderOption({
         style={{
           width: size,
           height: size,
-          backgroundColor: state === "selected" ? "#00d7de" : "#ffffff",
+          backgroundColor: isSelected ? "transparent" : "#ffffff",
         }}
       >
-        {state === "selected" && (
-          <Image
-            src="/onboarding/gender/select-ellipse.svg"
-            alt=""
-            aria-hidden="true"
-            width={233}
-            height={103}
-            className="pointer-events-none absolute bottom-[15%] left-1/2 w-[137%] max-w-none -translate-x-1/2"
-          />
-        )}
         <Image
-          src={state === "dimmed" ? graySrc : colorSrc}
+          src={imgSrc}
           alt=""
           width={imgWidth}
           height={imgHeight}
+          unoptimized
           className={`pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 object-contain transition-opacity duration-200 ${
-            state === "dimmed" ? "opacity-40" : ""
+            isDimmed ? "opacity-40" : ""
           }`}
         />
       </div>
@@ -98,8 +90,12 @@ export function GenderForm({
   const router = useRouter();
 
   const handleSelect = (gender: Gender) => {
-    setSelected(gender);
-    submitAction(gender);
+    setSelected((prev) => (prev === gender ? null : gender));
+  };
+
+  const handleNext = () => {
+    if (!selected) return;
+    submitAction(selected);
   };
 
   return (
@@ -130,9 +126,8 @@ export function GenderForm({
       <div className="mt-16 flex items-center justify-center gap-5">
         <GenderOption
           label="여자"
-          colorSrc="/onboarding/gender/woman-color.png"
-          graySrc="/onboarding/gender/woman-gray.png"
-          aspectRatio={344 / 434}
+          neutralSrc="/onboarding/gender/woman-neutral.png"
+          selectedSrc="/onboarding/gender/woman-selected.png"
           state={
             selected === "female"
               ? "selected"
@@ -145,9 +140,8 @@ export function GenderForm({
         />
         <GenderOption
           label="남자"
-          colorSrc="/onboarding/gender/man-color.png"
-          graySrc="/onboarding/gender/man-gray.png"
-          aspectRatio={381 / 463}
+          neutralSrc="/onboarding/gender/man-neutral.png"
+          selectedSrc="/onboarding/gender/man-selected.png"
           state={
             selected === "male"
               ? "selected"
@@ -165,6 +159,19 @@ export function GenderForm({
           {state.error}
         </p>
       )}
+
+      <div className="mt-auto w-full px-6 pb-8">
+        <button
+          type="button"
+          onClick={handleNext}
+          disabled={!selected || pending}
+          className={`font-korean w-full rounded-[15px] py-4 text-center text-[20px] font-bold text-white transition-colors disabled:opacity-50 ${
+            selected ? "bg-[#7f5b3b]" : "bg-[#dad4c8]"
+          }`}
+        >
+          {pending ? "저장 중..." : "다음"}
+        </button>
+      </div>
     </div>
   );
 }

@@ -26,5 +26,5 @@ export async function submitNickname(
     .eq("user_id", user.id);
   if (error) return { error: error.message };
 
-  redirect("/survey");
+  redirect("/onboarding/survey-intro");
 }
