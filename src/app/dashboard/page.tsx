@@ -3,7 +3,7 @@ import {
   ExpansionTrendChart,
   SpeciesRatioChart,
   WeeklyComparisonTile,
-} from "./charts";
+} from "@/components/charts";
 
 const SEAWEED_SPECIES = [
   "갈파래류",

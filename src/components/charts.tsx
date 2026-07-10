@@ -1,14 +1,16 @@
-const CATEGORICAL = [
+export const CATEGORICAL = [
   { name: "series-1", light: "#2a78d6", dark: "#3987e5" }, // blue
   { name: "series-2", light: "#1baf7a", dark: "#199e70" }, // aqua
   { name: "series-3", light: "#eda100", dark: "#c98500" }, // yellow
 ];
 
 export function WeeklyComparisonTile({
+  label = "이번 주 바다숲 조성 현황",
   location,
   points,
 }: {
-  location: string;
+  label?: string;
+  location?: string;
   points: { date: string; pct: number }[];
 }) {
   const sorted = [...points].sort((a, b) => a.date.localeCompare(b.date));
@@ -31,7 +33,10 @@ export function WeeklyComparisonTile({
 
   return (
     <div className="viz-root viz-stat-tile">
-      <div className="viz-stat-label">이번 주 바다숲 조성 현황 · {location}</div>
+      <div className="viz-stat-label">
+        {label}
+        {location ? ` · ${location}` : ""}
+      </div>
       <div className="viz-stat-row">
         <div>
           <div className="viz-stat-value">{current.pct.toFixed(1)}%</div>
@@ -260,7 +265,7 @@ export function ExpansionTrendChart({
   );
 }
 
-function ChartStyle() {
+export function ChartStyle() {
   return (
     <style>{`
       .viz-root {

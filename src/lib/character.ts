@@ -40,3 +40,11 @@ export function levelForPoints(totalPoints: number): CharacterProgress {
     pointsForNextLevel: nextThreshold - currentThreshold,
   };
 }
+
+/**
+ * Static display tiers for the 도감 Lv.1/4/12/20 stage row. There's no real
+ * per-species leveling yet (each user owns exactly one species instance), so this is
+ * purely a UI ladder compared against levelForPoints(totalPoints).level for the
+ * user's owned species — not tied to thresholdForLevel's growth curve.
+ */
+export const COLLECTION_STAGE_LEVELS = [1, 4, 12, 20] as const;
