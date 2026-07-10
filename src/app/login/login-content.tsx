@@ -13,40 +13,47 @@ export function LoginContent() {
       <Image
         src="/login/background.jpg"
         alt=""
-        fill
+        width={492}
+        height={874}
         priority
-        className="object-cover object-top"
+        className="absolute top-0 -left-[45.37px] h-[874px] w-[492px] max-w-none object-cover"
       />
 
-      <Image
-        src="/login/title-logo.png"
-        alt="키워봅서예 바다의 숲"
-        width={373}
-        height={373}
-        priority
-        className="absolute left-[5%] top-[7.4%] h-auto w-[93%]"
-      />
+      <div className="absolute top-0 left-1/2 h-[438px] w-[402px] -translate-x-1/2">
+        <Image
+          src="/login/title-logo.png"
+          alt="키워봅서예 바다의 숲"
+          width={373}
+          height={373}
+          priority
+          className="absolute top-[65px] left-[20.63px] size-[373px]"
+        />
+
+        <p className="absolute top-[333px] left-[201.13px] w-[119px] -translate-x-1/2 text-center font-display text-[23px] leading-[41px] text-[#099b9b]">
+          in Jeju
+        </p>
+      </div>
 
       <Image
         src="/login/seaweed-character.png"
         alt=""
         aria-hidden="true"
-        width={505}
-        height={991}
-        className="absolute left-[39%] top-[46%] h-auto w-[26%]"
+        width={104}
+        height={205}
+        className="absolute top-[401.25px] left-[156.63px] h-[205px] w-[104px]"
       />
 
       <Image
         src="/login/sea-moss-rock-character.png"
         alt=""
         aria-hidden="true"
-        width={368}
-        height={374}
-        className="absolute left-[69%] top-[70%] h-auto w-[20%]"
+        width={82}
+        height={83}
+        className="absolute top-[614.41px] left-[277.63px] h-[83px] w-[82px]"
       />
 
       <svg
-        className="absolute left-[4%] top-[74%] w-[25%]"
+        className="absolute top-[647.5px] left-[16.63px] h-[43.5px] w-[100.5px]"
         viewBox="0 0 100.5 43.5"
         fill="none"
         aria-hidden="true"
@@ -58,17 +65,13 @@ export function LoginContent() {
         src="/login/agar-character.png"
         alt=""
         aria-hidden="true"
-        width={494}
-        height={761}
-        className="absolute left-[11%] top-[65%] h-auto w-[29%]"
+        width={117}
+        height={180}
+        className="absolute top-[565.91px] left-[45.63px] h-[180px] w-[117px]"
       />
 
-      <p className="absolute top-[38%] left-1/2 w-full -translate-x-1/2 text-center font-display text-2xl text-[#099b9b]">
-        in Jeju
-      </p>
-
       {failed && (
-        <p className="absolute top-[79%] left-1/2 w-[85%] -translate-x-1/2 rounded-lg bg-white/90 px-3 py-2 text-center text-sm font-korean text-red-600 shadow">
+        <p className="absolute top-[700px] left-[201px] w-[308px] -translate-x-1/2 rounded-lg bg-white/90 px-3 py-2 text-center text-sm font-korean text-red-600 shadow">
           로그인에 실패했어요. 다시 시도해주세요.
         </p>
       )}
