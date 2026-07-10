@@ -29,10 +29,10 @@ export function LoginContent() {
           <Image
             src="/login/background.jpg"
             alt=""
-            width={492}
-            height={874}
+            width={402}
+            height={715}
             priority
-            className="absolute top-0 -left-[45.37px] h-[874px] w-[492px] max-w-none object-cover"
+            className="absolute top-0 left-0 h-auto w-[402px]"
           />
 
           <div className="absolute top-0 left-1/2 h-[438px] w-[402px] -translate-x-1/2">
