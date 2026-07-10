@@ -16,8 +16,8 @@ export async function submitNickname(
   if (!user) redirect("/login");
 
   const seaName = String(formData.get("seaName") ?? "").trim();
-  if (seaName.length < 1 || seaName.length > 20) {
-    return { error: "1자 이상 20자 이하로 입력해주세요." };
+  if (seaName.length < 2 || seaName.length > 4) {
+    return { error: "2~4글자만 사용할 수 있수다." };
   }
 
   const { error } = await supabase

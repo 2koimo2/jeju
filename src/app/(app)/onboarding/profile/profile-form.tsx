@@ -6,9 +6,6 @@ import { submitFullName, type ProfileActionState } from "./actions";
 
 const initialState: ProfileActionState = { error: null };
 
-const FONT_FAMILY =
-  "'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif";
-
 export function ProfileForm({
   defaultFullName,
 }: {
@@ -22,10 +19,7 @@ export function ProfileForm({
   const router = useRouter();
 
   return (
-    <div
-      className="flex min-h-screen flex-col bg-[#f7eedd]"
-      style={{ fontFamily: FONT_FAMILY }}
-    >
+    <div className="flex min-h-screen flex-col bg-[#f7eedd]">
       <div className="grid grid-cols-[24px_1fr_24px] items-center px-4 py-[15px]">
         <button
           type="button"
@@ -40,12 +34,12 @@ export function ProfileForm({
             />
           </svg>
         </button>
-        <p className="text-center text-[14px] font-semibold text-[#544e49]">
+        <p className="font-korean text-center text-[14px] font-semibold text-[#544e49]">
           프로필 설정
         </p>
       </div>
 
-      <h1 className="mt-12 px-4 text-center text-[28px] leading-[41px] font-bold text-[#262321]">
+      <h1 className="font-korean mt-12 px-4 text-center text-[28px] leading-[41px] font-bold text-[#262321]">
         반갑수다,
         <br />
         이름 좀 알려줍서~
@@ -64,18 +58,20 @@ export function ProfileForm({
           placeholder="이름 입력"
           autoFocus
           onChange={(e) => setHasValue(e.target.value.trim().length > 0)}
-          className="w-full max-w-[220px] border-none bg-transparent text-center text-[40px] font-bold text-[#262321] outline-none placeholder:font-medium placeholder:text-[#d4c9bf] caret-[#00b4ba]"
+          className="font-korean w-full max-w-[220px] border-none bg-transparent text-center text-[40px] font-bold text-[#262321] outline-none placeholder:font-medium placeholder:text-[#d4c9bf] caret-[#00b4ba]"
         />
 
         {state.error && (
-          <p className="mt-4 text-sm text-red-600">{state.error}</p>
+          <p className="font-korean mt-4 text-sm text-red-600">
+            {state.error}
+          </p>
         )}
 
         <div className="mt-auto w-full pb-8">
           <button
             type="submit"
             disabled={pending}
-            className={`w-full rounded-[15px] py-4 text-center text-[20px] font-bold text-white transition-colors disabled:opacity-50 ${
+            className={`font-korean w-full rounded-[15px] py-4 text-center text-[20px] font-bold text-white transition-colors disabled:opacity-50 ${
               hasValue ? "bg-[#7f5b3b]" : "bg-[#dad4c8]"
             }`}
           >
