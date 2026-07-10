@@ -14,6 +14,7 @@ function GenderOption({
   label,
   colorSrc,
   graySrc,
+  aspectRatio,
   state,
   onClick,
   disabled,
@@ -21,11 +22,14 @@ function GenderOption({
   label: string;
   colorSrc: string;
   graySrc: string;
+  aspectRatio: number;
   state: OptionVisualState;
   onClick: () => void;
   disabled: boolean;
 }) {
   const size = state === "selected" ? 170 : state === "dimmed" ? 130 : 150;
+  const imgHeight = size;
+  const imgWidth = Math.round(size * aspectRatio);
   const labelClass =
     state === "selected"
       ? "text-[32px] font-bold"
@@ -61,9 +65,9 @@ function GenderOption({
         <Image
           src={state === "dimmed" ? graySrc : colorSrc}
           alt=""
-          fill
-          sizes="170px"
-          className={`pointer-events-none object-cover transition-opacity duration-200 ${
+          width={imgWidth}
+          height={imgHeight}
+          className={`pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 object-contain transition-opacity duration-200 ${
             state === "dimmed" ? "opacity-40" : ""
           }`}
         />
@@ -128,6 +132,7 @@ export function GenderForm({
           label="여자"
           colorSrc="/onboarding/gender/woman-color.png"
           graySrc="/onboarding/gender/woman-gray.png"
+          aspectRatio={344 / 434}
           state={
             selected === "female"
               ? "selected"
@@ -142,6 +147,7 @@ export function GenderForm({
           label="남자"
           colorSrc="/onboarding/gender/man-color.png"
           graySrc="/onboarding/gender/man-gray.png"
+          aspectRatio={381 / 463}
           state={
             selected === "male"
               ? "selected"
