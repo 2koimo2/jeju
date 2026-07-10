@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 
 const TABS = [
   {
-    href: "/missions",
+    href: "/character",
     label: "나의 바당",
     active: "/tabbar/home-active.svg",
     inactive: "/tabbar/home-inactive.svg",

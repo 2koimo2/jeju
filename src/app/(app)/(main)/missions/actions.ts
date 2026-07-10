@@ -15,6 +15,24 @@ import { endOfKstDay } from "@/lib/time";
 import type { VerificationVerdict } from "@/lib/ai/schemas";
 import type { MissionRow } from "./types";
 
+/** Read-only fetch used by the home screen's missions overlay. */
+export async function getActiveMissions(): Promise<MissionRow[]> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data } = await supabase
+    .from("missions")
+    .select("*")
+    .eq("user_id", user.id)
+    .gt("expires_at", new Date().toISOString())
+    .order("created_at", { ascending: true });
+
+  return (data ?? []) as MissionRow[];
+}
+
 /**
  * Lazy mission generation: called with force=false on mount when the missions page has
  * no active batch for today, and with force=true from the "새 미션 받기" button. The

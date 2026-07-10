@@ -34,14 +34,26 @@ export function JejuReportTab({
     .sort((a, b) => a.date.localeCompare(b.date));
   const latestDate = weeklyPoints[weeklyPoints.length - 1]?.date;
 
-  const byLocation = new Map<string, { date: string; pct: number }[]>();
+  // Some survey dates have multiple readings per location; average them so
+  // each (location, date) contributes exactly one point to the trend line
+  // instead of duplicate-keyed, same-x spikes.
+  const byLocation = new Map<string, Map<string, number[]>>();
   for (const row of surveys) {
-    const list = byLocation.get(row.location) ?? [];
-    list.push({ date: row.survey_date, pct: row.total_seaweed_pct });
-    byLocation.set(row.location, list);
+    const byDateForLocation =
+      byLocation.get(row.location) ?? new Map<string, number[]>();
+    const pcts = byDateForLocation.get(row.survey_date) ?? [];
+    pcts.push(row.total_seaweed_pct);
+    byDateForLocation.set(row.survey_date, pcts);
+    byLocation.set(row.location, byDateForLocation);
   }
   const trendSeries = Array.from(byLocation.entries()).map(
-    ([location, points]) => ({ location, points }),
+    ([location, byDateForLocation]) => ({
+      location,
+      points: Array.from(byDateForLocation.entries()).map(([date, pcts]) => ({
+        date,
+        pct: pcts.reduce((a, b) => a + b, 0) / pcts.length,
+      })),
+    }),
   );
 
   const ratioMap = new Map(speciesRatio.map((r) => [r.species, r.pct]));

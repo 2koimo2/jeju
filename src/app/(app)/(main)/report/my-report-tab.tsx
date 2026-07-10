@@ -36,24 +36,6 @@ function CheckIcon() {
   );
 }
 
-// The report's "Icon - arrow" — same base path as the app's back-arrow icon,
-// rotated to point right instead of up.
-function ArrowIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      className="size-6 shrink-0 rotate-90"
-      aria-hidden="true"
-    >
-      <path
-        d="M12.75 20C12.75 20.1989 12.671 20.3897 12.5303 20.5303C12.3897 20.671 12.1989 20.75 12 20.75C11.8011 20.75 11.6103 20.671 11.4697 20.5303C11.329 20.3897 11.25 20.1989 11.25 20V10.75H6C5.85176 10.7499 5.70688 10.7058 5.58367 10.6234C5.46045 10.541 5.36442 10.4239 5.30771 10.2869C5.251 10.15 5.23615 9.99926 5.26503 9.85386C5.29392 9.70846 5.36524 9.57489 5.47 9.47L11.47 3.47C11.6106 3.32955 11.8012 3.25066 12 3.25066C12.1988 3.25066 12.3894 3.32955 12.53 3.47L18.53 9.47C18.6348 9.57489 18.7061 9.70846 18.735 9.85386C18.7638 9.99926 18.749 10.15 18.6923 10.2869C18.6356 10.4239 18.5395 10.541 18.4163 10.6234C18.2931 10.7058 18.1482 10.7499 18 10.75H12.75V20Z"
-        fill="#978f88"
-      />
-    </svg>
-  );
-}
-
 function ChevronLink({
   href,
   direction,
@@ -342,18 +324,17 @@ export function MyReportTab({
               >
                 <span className="flex items-center gap-[10px]">
                   <CheckIcon />
-                  <span className="font-korean text-[17px] font-semibold text-black">
+                  <span className="font-korean text-sm font-semibold text-black">
                     {mission.title}
                   </span>
                 </span>
-                <ArrowIcon />
               </Link>
             ))
           )}
         </div>
         <div className="mt-3 flex justify-end">
           <Link
-            href="/missions"
+            href="/character?missions=open"
             className="font-korean text-sm font-medium text-[#776b63]"
           >
             더 보기

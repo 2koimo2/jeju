@@ -30,7 +30,7 @@ export default async function ShopPage({
   return (
     <div className="flex flex-1 flex-col">
       <CategoryPills active={activeSpecies} />
-      <div className="flex-1 rounded-t-[15px] bg-[#f7eedd] px-4 pt-[28px] pb-6">
+      <div className="min-h-dvh flex-1 rounded-t-[15px] bg-[#f7eedd] px-4 pt-[28px] pb-6">
         <div className="grid grid-cols-2 gap-x-[23px] gap-y-[27px]">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
