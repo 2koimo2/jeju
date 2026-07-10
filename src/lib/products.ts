@@ -20,6 +20,7 @@ export const PRODUCTS: Product[] = [
     price: 6000,
     discountPct: 15,
     requiredCount: 5,
+    image: "/collection/products/umutgasari-pudding.png",
   },
   {
     id: "umutgasari-soap",
@@ -36,6 +37,7 @@ export const PRODUCTS: Product[] = [
     price: 6000,
     discountPct: 15,
     requiredCount: 3,
+    image: "/collection/products/tot-jelly.png",
   },
   {
     id: "tot-powder",
@@ -52,6 +54,7 @@ export const PRODUCTS: Product[] = [
     price: 6000,
     discountPct: 15,
     requiredCount: 4,
+    image: "/collection/products/parae-snack.png",
   },
   {
     id: "parae-gim",
@@ -68,6 +71,7 @@ export const PRODUCTS: Product[] = [
     price: 6000,
     discountPct: 15,
     requiredCount: 2,
+    image: "/collection/products/miyeok-dolmiyeok.png",
   },
   {
     id: "miyeok-guk-kit",
@@ -111,8 +115,18 @@ export const PRODUCTS: Product[] = [
   },
 ];
 
+/** Products with a real photo first, then by price ascending within each group. */
+function sortForDisplay(products: Product[]): Product[] {
+  return [...products].sort((a, b) => {
+    const hasImageDiff = Number(!!b.image) - Number(!!a.image);
+    if (hasImageDiff !== 0) return hasImageDiff;
+    return a.price - b.price;
+  });
+}
+
 export function getProductsBySpecies(species?: SpeciesKey): Product[] {
-  return species
+  const filtered = species
     ? PRODUCTS.filter((product) => product.species === species)
     : PRODUCTS;
+  return sortForDisplay(filtered);
 }
