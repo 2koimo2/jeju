@@ -19,8 +19,18 @@ function PlusIcon() {
 }
 
 function PhotoPicker({ name }: { name: string }) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  // `submitInputRef` is the field that actually gets uploaded — it has no
+  // `capture`, so it never forces the camera open on its own; it's only ever
+  // populated programmatically (via DataTransfer) from whichever of the two
+  // choice-sheet inputs below the user picks. That's what lets "사진 촬영"
+  // (forces the camera) and "앨범에서 선택" (opens the photo library) be two
+  // real, distinct choices instead of leaving it up to the browser's default
+  // camera-vs-library heuristic for a single `capture` input.
+  const submitInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [showChoices, setShowChoices] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -28,27 +38,53 @@ function PhotoPicker({ name }: { name: string }) {
     };
   }, [previewUrl]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-    setPreviewUrl(file ? URL.createObjectURL(file) : null);
+  const applyFile = (file: File | undefined) => {
+    if (!file) return;
+    setPreviewUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return URL.createObjectURL(file);
+    });
+
+    // Inputs can't have their `.files` set from a File directly — DataTransfer
+    // is the standard workaround to hand a programmatically-obtained file to
+    // a real <input type="file"> so it still submits with the form normally.
+    const transfer = new DataTransfer();
+    transfer.items.add(file);
+    if (submitInputRef.current) {
+      submitInputRef.current.files = transfer.files;
+    }
+    setShowChoices(false);
   };
 
   return (
     <div>
       <input
-        ref={inputRef}
+        ref={submitInputRef}
         type="file"
         name={name}
         accept="image/*"
-        capture="environment"
         required
-        onChange={handleChange}
         className="hidden"
       />
+      <input
+        ref={cameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={(e) => applyFile(e.target.files?.[0])}
+      />
+      <input
+        ref={galleryInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => applyFile(e.target.files?.[0])}
+      />
+
       <button
         type="button"
-        onClick={() => inputRef.current?.click()}
+        onClick={() => setShowChoices(true)}
         aria-label="인증 사진 선택"
         className="relative flex h-[162px] w-full items-center justify-center overflow-hidden rounded-[17px] bg-[#e8ddc8]"
       >
@@ -63,6 +99,36 @@ function PhotoPicker({ name }: { name: string }) {
           <PlusIcon />
         )}
       </button>
+
+      {showChoices && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/40"
+          onClick={() => setShowChoices(false)}
+        >
+          <div
+            className="w-full max-w-sm rounded-t-[20px] bg-white p-4 pb-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="mb-4 text-center text-sm text-[#a69382]">
+              인증 사진 가져오기
+            </p>
+            <button
+              type="button"
+              onClick={() => cameraInputRef.current?.click()}
+              className="mb-2 w-full rounded-[15px] bg-[#7f5b3b] py-4 text-center text-[18px] font-bold text-white"
+            >
+              사진 촬영
+            </button>
+            <button
+              type="button"
+              onClick={() => galleryInputRef.current?.click()}
+              className="w-full rounded-[15px] border border-[#c4b8a3] py-4 text-center text-[18px] font-bold text-[#7f5b3b]"
+            >
+              앨범에서 선택
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
